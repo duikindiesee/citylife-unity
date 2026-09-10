@@ -68,6 +68,8 @@ namespace CityLife.World.Editor
         private static bool ph02FittedMode;
         private static bool ph02FamilyMode,ph02FamilyMeshReadbackPassed;
         private static float ph02FoliageTint;
+        private static bool ph02ShotSelectionRequested;
+        private static string[] ph02SelectedShotIds=Array.Empty<string>();
         private static PH02FamilyComponent.Report ph02FamilyChecks;
         private static string ph02FamilyMeshSha256,ph02FamilyFailureType;
         private static bool ph02ImportedTuplesRequested,ph02ImportedCrownMeshReadbackPassed;
@@ -104,7 +106,7 @@ namespace CityLife.World.Editor
         private static AmbientRecord initialAmbient;
         private static Material[] diagnosticOriginalMaterials;
         private static Renderer diagnosticRenderer;
-        private static int ExpectedCaptures => woodDiagnosticMode ? 3 : ph02FittedMode ? 12 : ph01TangentMode ? (ph01OriginalSubsetsReady ? 12 : 8) : ph02CrownMode ? 8 : playablePreviewMode ? 2 : importedCandidateMode ? 12 : hybridMode ? 21 : 15;
+        private static int ExpectedCaptures => ph02FamilyMode ? ph02SelectedShotIds.Length : woodDiagnosticMode ? 3 : ph02FittedMode ? 12 : ph01TangentMode ? (ph01OriginalSubsetsReady ? 12 : 8) : ph02CrownMode ? 8 : playablePreviewMode ? 2 : importedCandidateMode ? 12 : hybridMode ? 21 : 15;
 
         public static void RenderBatch() => Run(false);
         public static void RenderImportedCandidates() => Run(true);
@@ -128,7 +130,9 @@ namespace CityLife.World.Editor
                 ConfigureOutput();
                 SetupPipeline();
                 SetupScene();
-                foreach (Shot shot in woodDiagnosticMode ? BuildShots().Where(s=>s.Id.StartsWith("04-",StringComparison.Ordinal)||s.Id.StartsWith("05-",StringComparison.Ordinal)||s.Id.StartsWith("15-",StringComparison.Ordinal)).ToList() : ph02FittedMode ? BuildPH02FittedShots() : ph01TangentMode ? BuildPH01TangentShots() : ph02CrownMode ? BuildPH02Shots() : playablePreviewMode ? BuildPreviewShots() : importedCandidateMode ? BuildImportedShots() : BuildShots())
+                List<Shot> shots = woodDiagnosticMode ? BuildShots().Where(s=>s.Id.StartsWith("04-",StringComparison.Ordinal)||s.Id.StartsWith("05-",StringComparison.Ordinal)||s.Id.StartsWith("15-",StringComparison.Ordinal)).ToList() : ph02FittedMode ? BuildPH02FittedShots() : ph01TangentMode ? BuildPH01TangentShots() : ph02CrownMode ? BuildPH02Shots() : playablePreviewMode ? BuildPreviewShots() : importedCandidateMode ? BuildImportedShots() : BuildShots();
+                if(ph02FamilyMode)shots=shots.Where(s=>ph02SelectedShotIds.Contains(s.Id,StringComparer.Ordinal)).ToList();
+                foreach (Shot shot in shots)
                 {
                     shot.Configure();
                     if(ph02ImportedTuplesRequested)ApplyPH02ReferenceCamera(shot.Id);
@@ -178,8 +182,13 @@ namespace CityLife.World.Editor
             if(ph02CrownMode) ph02CutHeight=float.Parse(Argument("-ph02CutHeight",PH02CrownCandidate.ProposedCutHeight.ToString("R",CultureInfo.InvariantCulture)),CultureInfo.InvariantCulture);
             if(ph01TangentMode)ph01ExactTupleDedup=Argument("-ph01ExactTupleDedup","0")=="1";
             if(ph02FittedMode)ph02ImportedTuplesRequested=Argument("-ph02ImportedTuples","0")=="1";
+            ph02ShotSelectionRequested=Array.IndexOf(Environment.GetCommandLineArgs(),"-ph02Shots")>=0;
+            if(ph02ShotSelectionRequested&&!ph02FamilyMode)throw new ArgumentException("-ph02Shots requires the PH02Family inspection mode.");
             if(ph02FamilyMode)
             {
+                // Building the shot declarations does not execute any Configure callback.
+                // Resolve against this actual PH02 catalogue before creating a scene/tree.
+                ph02SelectedShotIds=ResolvePH02ShotSelection(ph02ShotSelectionRequested?Argument("-ph02Shots",""):null,BuildShots().Select(s=>s.Id).ToArray());
                 ph02FoliageTint=float.Parse(Argument("-ph02FoliageTint","0"),CultureInfo.InvariantCulture);
                 if(float.IsNaN(ph02FoliageTint)||float.IsInfinity(ph02FoliageTint)||ph02FoliageTint<0||ph02FoliageTint>1)throw new ArgumentOutOfRangeException("ph02FoliageTint");
             }
@@ -191,6 +200,25 @@ namespace CityLife.World.Editor
             Directory.CreateDirectory(outputDirectory);
             dateStamp = DateTime.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             safeToWrite = true;
+        }
+
+        private static string[] ResolvePH02ShotSelection(string csv,string[] availableIds)
+        {
+            if(availableIds==null||availableIds.Length!=21||availableIds.Distinct(StringComparer.Ordinal).Count()!=availableIds.Length)
+                throw new InvalidOperationException("The PH02 family catalogue must contain its 21 unique existing shot IDs.");
+            if(csv==null)return (string[])availableIds.Clone();
+            if(string.IsNullOrWhiteSpace(csv))throw new ArgumentException("PH02Shots must be a nonempty comma-separated list such as 05,08,13,18,20,21.");
+            var numbers=new HashSet<string>(StringComparer.Ordinal);
+            foreach(string raw in csv.Split(','))
+            {
+                string number=raw.Trim();
+                if(!Regex.IsMatch(number,"^[0-9]{2}$")||!availableIds.Any(id=>id.StartsWith(number+"-",StringComparison.Ordinal)))
+                    throw new ArgumentException("Unknown PH02 shot number: "+number);
+                if(!numbers.Add(number))throw new ArgumentException("Duplicate PH02 shot number: "+number);
+            }
+            // Always preserve the full catalogue's order and exact Configure/Restore
+            // delegates. Requested order must not change cross-shot state or cameras.
+            return availableIds.Where(id=>numbers.Contains(id.Substring(0,2))).ToArray();
         }
 
         private static string Argument(string name, string fallback)
@@ -372,7 +400,9 @@ namespace CityLife.World.Editor
                 }
                 sourceLeafMaterial.SetColor("_BaseColor",source.GetColor("_BaseColor"));
                 foreach(string property in new[]{"_BumpScale","_Smoothness","_Cull"})sourceLeafMaterial.SetFloat(property,source.GetFloat(property));
-                sourceLeafMaterial.SetFloat("_FoliageTintStrength",ph02FoliageTint);sourceLeafMaterial.SetFloat("_DiagnosticAlbedo",0f);
+                sourceLeafMaterial.SetFloat("_FoliageTintStrength",ph02FoliageTint);
+                sourceLeafMaterial.SetFloat("_MatchTreeSkin",1f);
+                sourceLeafMaterial.SetFloat("_DiagnosticAlbedo",0f);
                 sourceLeafMaterial.EnableKeyword("_NORMALMAP");sourceLeafMaterial.EnableKeyword("_METALLICSPECGLOSSMAP");
                 importedBindings.Add(sourceLeafMaterial,importedBindings[source]);
 
@@ -1649,16 +1679,17 @@ ENDHLSL
             var report = new Report
             {
                 schema = "citylife.kokerboom-inspection.v1", utc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture),
-                status = passed ? "Rendered for independent critique" : "Technical rendering failure; see local editor log",
-                technicalChecksPassed = passed, visualAcceptance = "Not scored. Independent critique is required.",
-                scope = ph02FamilyMode ? "Changed v2-preview PH02 fitted-crown family: actual imported tuple component and PH01 mapped procedural wood; first17 standard family views plus measured lower joins and bases. Component checks are separate from full-family numerical/visual acceptance, native controls and sustained runtime performance." : woodDiagnosticMode ? "Scoped main-specimen wood diagnostic using unchanged R09 BuildShots configurations04,05,15: seed4242,age1,LOD0,source-leaf hybrid. No extra ages, seed lineup or prototype generation; compare actual recorded cameras before attributing image differences to geometry." : ph02FittedMode ? "Scoped PH02 source/current/fitted support comparison. Original-scale unchanged crown at native source origin; separately indexed open support with actual rim P/N/UV/tangent4 and vertex-red source-to-pale blend. Actual Create metrics and independent mesh readback retained; no family generation, whole-tree weld or visual acceptance." : ph01TangentMode ? "Scoped PH01 A/D current versus imported-tuple tangent comparison; same native roots, original scale, neutral illumination and fixed group cameras, normal map on/off. Optional original imported subsets have separately checked triangle count and mapped-corner coverage. No family generation, normal/UV flips, runtime substitution or visual acceptance." : ph02CrownMode ? "Scoped PH02 original/cut/attachment comparison at original metre scale with explicit source maps. The crown cut is open and leaf completeness/attachment remain unaccepted. No procedural family, native input, world integration or earlier numeric validation claim." : importedCandidateMode ? "Actual Unity URP GPU comparison of two unreviewed imported Poly Haven originals at imported scale with explicit source material maps. No procedural age/seed variation or full rubric-gate claim; no native input or desktop presentation." : "Actual Unity URP GPU renders of a procedural tree and small inspection/prototype stage. No full terrain, native input, desktop presentation, player save access or reference-image billboard.",
-                mode = ph02FamilyMode ? "hybrid-ph02-fitted-crown-family-experiment" : woodDiagnosticMode ? "r09-matched-wood-diagnostic" : ph02FittedMode ? "ph02-fitted-support-comparison" : ph01TangentMode ? "ph01-imported-tangent-comparison" : ph02CrownMode ? "ph02-source-crown-comparison" : playablePreviewMode ? "preacceptance-local-playable-preview-stage" : importedCandidateMode ? "imported-candidate-comparison" : hybridMode ? "hybrid-source-rosette-family-experiment" : "procedural-model-inspection",
+                status = passed ? (ph02ShotSelectionRequested?"Rendered scoped PH02 inspection; not a full-family review set":"Rendered for independent critique") : "Technical rendering failure; see local editor log",
+                technicalChecksPassed = passed, visualAcceptance = ph02ShotSelectionRequested?"Not scored. Selected shots do not constitute a full-family evidence set.":"Not scored. Independent critique is required.",
+                scope = ph02ShotSelectionRequested ? "Scoped selected-shot PH02 inspection from the existing full catalogue. Same view categories: shot functions and canonical order retained, but bounds-dependent cameras may differ. Actual recorded camera-field deltas against R16 are written by the launcher to ph02-shot-camera-comparison.json; R16 matrices were not recorded. Only selected Configure callbacks execute. This is not a full-family review round, numeric pass or runtime acceptance." : ph02FamilyMode ? "Changed v2-preview PH02 fitted-crown family: actual imported tuple component and PH01 mapped procedural wood; first17 standard family views plus measured lower joins and bases. Component checks are separate from full-family numerical/visual acceptance, native controls and sustained runtime performance." : woodDiagnosticMode ? "Scoped main-specimen wood diagnostic using unchanged R09 BuildShots configurations04,05,15: seed4242,age1,LOD0,source-leaf hybrid. No extra ages, seed lineup or prototype generation; compare actual recorded cameras before attributing image differences to geometry." : ph02FittedMode ? "Scoped PH02 source/current/fitted support comparison. Original-scale unchanged crown at native source origin; separately indexed open support with actual rim P/N/UV/tangent4 and vertex-red source-to-pale blend. Actual Create metrics and independent mesh readback retained; no family generation, whole-tree weld or visual acceptance." : ph01TangentMode ? "Scoped PH01 A/D current versus imported-tuple tangent comparison; same native roots, original scale, neutral illumination and fixed group cameras, normal map on/off. Optional original imported subsets have separately checked triangle count and mapped-corner coverage. No family generation, normal/UV flips, runtime substitution or visual acceptance." : ph02CrownMode ? "Scoped PH02 original/cut/attachment comparison at original metre scale with explicit source maps. The crown cut is open and leaf completeness/attachment remain unaccepted. No procedural family, native input, world integration or earlier numeric validation claim." : importedCandidateMode ? "Actual Unity URP GPU comparison of two unreviewed imported Poly Haven originals at imported scale with explicit source material maps. No procedural age/seed variation or full rubric-gate claim; no native input or desktop presentation." : "Actual Unity URP GPU renders of a procedural tree and small inspection/prototype stage. No full terrain, native input, desktop presentation, player save access or reference-image billboard.",
+                mode = ph02ShotSelectionRequested ? "hybrid-ph02-fitted-crown-scoped-inspection" : ph02FamilyMode ? "hybrid-ph02-fitted-crown-family-experiment" : woodDiagnosticMode ? "r09-matched-wood-diagnostic" : ph02FittedMode ? "ph02-fitted-support-comparison" : ph01TangentMode ? "ph01-imported-tangent-comparison" : ph02CrownMode ? "ph02-source-crown-comparison" : playablePreviewMode ? "preacceptance-local-playable-preview-stage" : importedCandidateMode ? "imported-candidate-comparison" : hybridMode ? "hybrid-source-rosette-family-experiment" : "procedural-model-inspection",
                 importedTupleChecks=importedTupleChecks,importedTupleFailureType=importedTupleFailureType,originalSubsetImagesIncluded=ph01OriginalSubsetsReady,
                 ph02FittedChecks=ph02FitMetrics,ph02FittedReadback=ph02FitReadback,ph02FittedFailureType=ph02FitFailureType,
                 ph02ImportedTuplesRequested=ph02ImportedTuplesRequested,ph02ImportedCrownChecks=ph02ImportedCrownChecks,ph02ImportedCrownMeshReadbackPassed=ph02ImportedCrownMeshReadbackPassed,
                 ph02ImportedMeshExpandedSha256=ph02ImportedMeshExpandedSha256,ph02ReferenceCameraManifest=ph02ImportedTuplesRequested?PH02ReferenceCameraManifest:"",ph02ReferenceCameraManifestSha256=ph02ReferenceCameraManifestSha256,
                 ph02FamilyChecks=ph02FamilyChecks,ph02FamilyMeshReadbackPassed=ph02FamilyMeshReadbackPassed,ph02FamilyMeshSha256=ph02FamilyMeshSha256,
                 ph02FamilyFailureType=ph02FamilyFailureType,ph02FoliageTintStrength=ph02FoliageTint,
+                ph02ShotSelectionRequested=ph02ShotSelectionRequested,ph02SelectedShotIds=ph02SelectedShotIds,
                 initialAmbientProbe = initialAmbient,
                 referenceDirection = "User-provided Kooker Nexus artwork; gold/ochre tree, teal succulent leaves, navy/cobalt sky. Earth explicitly excluded; one procedural blue gas giant only.",
                 unityVersion = Application.unityVersion, graphicsDevice = SystemInfo.graphicsDeviceName, graphicsApi = SystemInfo.graphicsDeviceType.ToString(),
@@ -1714,6 +1745,8 @@ ENDHLSL
             public bool ph02FamilyMeshReadbackPassed;
             public string ph02FamilyMeshSha256,ph02FamilyFailureType;
             public float ph02FoliageTintStrength;
+            public bool ph02ShotSelectionRequested;
+            public string[] ph02SelectedShotIds;
             public bool ph02ImportedTuplesRequested,ph02ImportedCrownMeshReadbackPassed;
             public PH02ImportedCrownCandidate.Report ph02ImportedCrownChecks;
             public string ph02ImportedMeshExpandedSha256,ph02ReferenceCameraManifest,ph02ReferenceCameraManifestSha256;

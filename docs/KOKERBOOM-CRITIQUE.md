@@ -1,14 +1,16 @@
 # Kokerboom critique protocol
 
+**Current user direction:** R06 is the approved visual reference. The numeric/full R19 review is complete and the experimental result is preserved; tree work is frozen. Remaining defects are deferred; the historical 9/10 rubric below no longer blocks world work. See [TREE-BASELINE.md](TREE-BASELINE.md).
+
 Protocol version: `citylife.kokerboom-critique.v1`, fixed before the follow-up's first independent render review. See [KOKERBOOM-REFERENCE.md](KOKERBOOM-REFERENCE.md) for botanical sources, scale targets, and art provenance. Recorded scores come from independent image review; the geometry author and documentation author must not self-award acceptance.
 
 The [interactive visual review](KOKERBOOM-VISUAL-REVIEW.html) presents the preserved evidence and score history. This document retains the exact review scope, arithmetic and outstanding defects.
 
-## Required evidence set
+## Historical required evidence set
 
 Capture the same identified mature specimen in front, three-quarter, and rear views under neutral light. Add close-ups of at least two branch unions, lower-trunk bark and its transition to upper branches, and a terminal rosette with individual leaves readable. Include a fixed-seed juvenile-to-adult lineup with metre marks or a labelled human-scale reference. Framing must show the full crown and trunk where required.
 
-Then capture **two actual 3D prototype-patch views at player framing**, including neutral and reference-inspired lighting. Show a readable nearby tree and the tree population with believable ground contact and scale. A populated prototype ground patch is sufficient; an isolated specimen against a studio plane is not population evidence. Neither a completed landscape nor water/underworld rendering is required for this first tree review. Approve the tree before the landscape rewrite; repeat actual gameplay population views after terrain integration to verify that the accepted identity remains readable.
+Then capture **two actual 3D prototype-patch views at player framing**, including neutral and reference-inspired lighting. Show a readable nearby tree and the tree population with believable ground contact and scale. A populated prototype ground patch is sufficient; an isolated specimen against a studio plane is not population evidence. Neither a completed landscape nor water/underworld rendering is required for this first tree review. The original protocol required tree approval before the landscape rewrite. The later user-directed freeze supersedes that prerequisite; future world integration can assess the retained identity without another tree-polishing loop.
 
 Retain original rendered image files and their dimensions. Label image IDs, seed, `age01`, LOD, geometry version, camera transform/FOV, lighting preset, exposure/post-processing, renderer, and build/commit or source digest. Record mesh hashes and validation report paths. A contact sheet may aid review, but it does not replace full-resolution close-ups. Do not use image generation, painting, or retouching as implementation evidence.
 
@@ -38,14 +40,14 @@ Use the same anchors for all six criteria:
 
 The critic must give a short image-specific reason for every score, including the strongest evidence and any remaining defect. State uncertainty when resolution or framing prevents a conclusion. Do not infer surface quality from a distant silhouette or botanical quality from attractive lighting.
 
-## Acceptance calculation
+## Historical critic acceptance calculation
 
 - **Botanical mean** = `(criterion 1 + criterion 2 + criterion 3 + criterion 4) / 4`.
 - **Art mean** = `(criterion 5 + criterion 6) / 2`.
 - **Overall** = the lower of the botanical and art means.
 - **Pass** requires both means to be at least **9.0**, all six criteria verified, the full evidence set present, and **no major defect**. Keep the actual arithmetic; do not round a value below 9.0 up to a pass.
 
-A major defect blocks acceptance regardless of means. The critic explicitly labels major defects and names their image IDs. A missing or unverified criterion blocks a pass; leave the means pending instead of substituting numbers. The evidence and rule remain fixed across iterations. Improve the implementation, rerender affected views, and request another independent review; do not delete an inconvenient view or revise the weights after seeing a score.
+A major defect blocks acceptance regardless of means. The critic explicitly labels major defects and names their image IDs. A missing or unverified criterion blocks a pass; leave the means pending instead of substituting numbers. The evidence and rule remain fixed across iterations. The earlier protocol called for implementation revisions and renewed independent review, retaining inconvenient evidence and fixed weights. That iterative requirement is retired by the current user-directed freeze.
 
 ## Round 01: rejected
 
@@ -280,9 +282,9 @@ The next family setup uses a separately identified `citylife.aloidendron-dichoto
 | Palette and light identity | 5.5 | Albedo-only 16 is clearer but still olive. Stronger cool fill in 17 mainly lights wood; the required blue-green canopy remains unresolved. |
 | In-world readability | 6.0 | Fuller foliage is visible in the populated views, but ordinary gameplay light does not establish the intended cool canopy and warm-trunk separation. 08–09, 16–17. |
 
-**Botanical mean: 6.75. Art mean: 5.75. Overall: 5.75/10**, displayed as **5.8/10** at one decimal place. This replaces R09's 5.50 as the latest full-family result; the earlier review remains preserved. Both means remain below **9.0**, and major join/surface and ground-contact defects block acceptance. Numerical checks and scoped source studies are excluded from the visual arithmetic.
+**Botanical mean: 6.75. Art mean: 5.75. Overall: 5.75/10**, displayed as **5.8/10** at one decimal place. At the time, this replaced R09's 5.50 as the latest full-family result; the earlier review remains preserved. Both means remain below **9.0**, and major join/surface and ground-contact defects block acceptance. Numerical checks and scoped source studies are excluded from the visual arithmetic.
 
-The next coherent revision retains the fuller PH02 rosettes and addresses continuous skin/material treatment across the support and wood, bend shading, natural juvenile/mature ground contact, readable blue-green foliage under ordinary game light, and varied poses/scars with selective bark flakes. This is a targeted next revision, not evidence those fixes are implemented.
+At the time of this review, the critic proposed a coherent revision retaining the fuller PH02 rosettes and addressing support/wood skin, bend shading, ground contact, blue-green foliage and varied bark/poses. R17/R18 record the subsequent scoped work. The latest user direction now defers remaining defects and ends polishing with the completed R19 review.
 
 R16 uses `citylife.aloidendron-dichotomum.v2-preview`, with frozen geometry SHA256 `d051e8f9871fab0187fbd825af0dd98fe51d6e2f38b9c9c62ee3105c6fe1addf`. The [component/readback report](../evidence/milestones/kokerboom/round-16/ph02-family-component-checks.json) verifies the actual imported PH02 tuple mapping, owned-clone fit and rigid component frame: **44,975 vertices and 74,519 triangles**, native readback hash `8a84ee3756a74ff8848fb56853896321a70aadf3dffaede506da4e29d75388b3`, unchanged input hashes, and **foliage tint strength 0**. Crown/support indices remain separate; this is not a welded whole tree. [Derivative credits](ASSET-CREDITS.md#ph02-fitted-crown-family-r16) distinguish unchanged downloads from the generated family.
 
@@ -314,7 +316,34 @@ All 21 originals are preserved, including actual lower crown-to-wood side/unders
 | 20 | [Ph02 juvenile base](../evidence/milestones/kokerboom/round-16/2026-09-10-20-ph02-juvenile-base.png) |
 | 21 | [Ph02 mature base second angle](../evidence/milestones/kokerboom/round-16/2026-09-10-21-ph02-mature-base-second-angle.png) |
 
-## Report template
+## R17/R18 scoped pilots and current closeout
+
+R17 and R18 each retained six actual views with technical capture checks passed, zero errors and one warning. **Neither has a full-family score.** R17 matches R16's recorded camera fields only in shot 18; all R18 fields differ by view. [Both six-view sets and their camera-delta reports](VISUAL-MILESTONES.md#scoped-tree-pilots--r17-and-r18--2026-09-10) are preserved. Matching view categories do not establish replayed cameras or matrix equivalence.
+
+The [R18 numeric report](../evidence/verified/kokerboom-round-18-family-validation.json) passes 536 assertions with ten specimens/wood topology samples, independent regeneration, eleven unchanged source inputs and PH02 cleanup. This applies to the revised experimental source; it does not alter R16's visual score or erase its numeric failure. R19's final independent result is 7.375/10. Remaining defects are deferred under the [user-directed R06 baseline/freeze](TREE-BASELINE.md); no further corrective round is prescribed.
+
+## Round 19 frozen family review
+
+**Final independent result: 7.375/10 (7.4 at one decimal), rejected under the historical 9/10 rubric.** All 21 images were reviewed. Botanical mean **7.375**; art mean **7.5**. This frozen experimental candidate does not replace the user-approved R06 visual reference. Remaining defects are **deferred**; tree polishing is closed by user direction.
+
+The [full capture manifest](../evidence/milestones/kokerboom/round-19/metrics.json) records `2026-09-10T21:38:24.4067079Z`, **21 actual Unity offscreen images**, technical capture checks passed, **zero errors and one warning**. This is the full PH02-family mode with foliage tint 1, not either six-view pilot. The [freeze record](../evidence/verified/starfall-tree-baseline.json) rechecks the nine frozen source files and ties this candidate to the separate [R18 numeric PASS, 536 assertions](../evidence/verified/kokerboom-round-18-family-validation.json). Numerical success does not award visual scores or validate a new player.
+
+All [21 original images are catalogued](VISUAL-MILESTONES.md#round-19-frozen-family-review) and were inspected by the independent critic dispatched by the coordinating task. Scores below are that final review, not author self-scoring. The historical rubric is retained for evaluation, but the user has ended the polishing loop and removed it as a prerequisite for world work.
+
+| Fixed criterion | Score / 10 | Independent finding and deferred defect |
+|---|---|---|
+| 1. Anatomy and silhouette | 7.5 | Recognizable broad crown; thick angular bends/internal openings and similar family branching remain |
+| 2. Joins and surface | 7.0 | Alternating material bands removed; small rim-like junction at 18, stepped bend shading at 04/10/15 and repeated scars/weak peeling at 05/21 remain |
+| 3. Rosettes and leaves | 8.0 | Fuller natural leaf form retained; repeated rosettes across juvenile/mature trees and uniform cyan weathering remain |
+| 4. Age and size variation | 7.0 | Better juvenile stem and ground contact; no clear floating gap in 20/21, but family/rosette repetition remains |
+| 5. Palette and light identity | 7.5 | Continuous blue-green foliage gained; uniform cyan weathering and bright wood remain |
+| 6. In-world readability | 7.5 | Improved cool canopy identity; bright wood and foliage readability at distance remain imperfect |
+
+Botanical mean `(7.5 + 7 + 8 + 7) / 4 = 7.375`; art mean `(7.5 + 7.5) / 2 = 7.5`; overall is the lower mean, **7.375**, displayed as **7.4**. This remains below the historical 9/10 bar. The prior R16 result of 5.75 remains preserved; numeric checks contribute no points.
+
+**Disposition: frozen, defects deferred.** Retain the user-approved running R06 reference and its exact package. R19 remains the separately preserved source-only experiment. No new player, automatic promotion or further corrective round follows this review.
+
+## Historical report template
 
 Fill this only from an actual independent critique:
 
@@ -338,15 +367,15 @@ Overall (lower mean): PENDING
 Major defects: NOT YET ASSESSED
 Required evidence complete: NOT YET VERIFIED
 Decision: NOT YET REVIEWED
-Next targeted changes:
+Remaining defects (deferred under the current freeze):
 ```
 
 ## Delivery boundary
 
 | Claim | Status | Evidence | Remaining gap |
 |---|---|---|---|
-| Fixed full-family criteria and pass rule | Applied unchanged through R16 | Full-family Rounds 01/02/04/07/09/16; scoped studies kept separate | Further independent review after revision |
-| Current PH02 numerical mesh checks | **FAIL at assertion 522**, buried full-age root | [Exact failure report](../evidence/verified/kokerboom-round-16-ph02-validation-failed.json); ten closed wood inspections, nine recorded specimens, regeneration and PH02 cleanup | Repair root geometry and rerun; historical R09 pass does not validate this family |
-| Full-family botanical and art acceptance | R16 rejected | Twenty-one images; botanical 6.75, art 5.75, overall 5.75 | Support/wood continuity, bend shading, ground contact, bark and blue-green readability |
-| Imported candidates and fitted attachment | Scoped reviews and R15 tuple reduction recorded; R16 family rejected | R13 exact rim, R15 actual imported tuple reduction, R16 component/readback report | Lower join material/shading, ground contact, palette and runtime validation remain |
-| Native WIP preview | Separate player built and launched; full acceptance unverified | R06 preview build and [current scope](STARFALL.md) | Native control, performance and offline evidence remain separate from this image rubric |
+| R06 tree visual reference | **User approved; retained unchanged** | [Baseline and technical freeze](TREE-BASELINE.md) | Full native control, collision, performance and offline evidence remain separate |
+| Fixed critic rubric | Historical evaluation retained | Full-family Rounds 01/02/04/07/09/16; scoped studies separate | No longer a world-work gate or requirement for further polishing |
+| Revised PH02 numerical mesh checks | **R18 PASS, 536 assertions** | [Exact report](../evidence/verified/kokerboom-round-18-family-validation.json), [historical R16 failure](../evidence/verified/kokerboom-round-16-ph02-validation-failed.json) | Numerical scope only; no visual/native-runtime score |
+| R19 experimental candidate | Full 21-view capture complete; **independent result 7.375/10, frozen** | [Closing review](#round-19-frozen-family-review) | Final judgement recorded; defects deferred; no automatic R06 promotion |
+| Historical R16 full review | Rejected, overall 5.75 | Twenty-one images; botanical 6.75, art 5.75 | Preserved history; remaining defects deferred |

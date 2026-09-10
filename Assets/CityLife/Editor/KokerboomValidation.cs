@@ -414,7 +414,7 @@ namespace CityLife.World.Editor
             }
             Check(Finite(sample.actualMinimum) && Finite(sample.actualMaximum) && sample.actualMaximum.y > .1f && sample.actualMaximum.y <= 9f,
                 "whole specimen is finite and within the chosen 9 m above-ground scale ceiling");
-            Check(sample.actualMinimum.y >= -1f && sample.actualMinimum.y <= .02f, "root reaches ground without an excessive buried base");
+            Check(sample.actualMinimum.y >= -1f && sample.actualMinimum.y <= .02f, "root reaches ground without an excessive buried base; actualMinimum=" + PointText(sample.actualMinimum));
             report.specimens.Add(sample); return sample;
         }
 
@@ -522,6 +522,7 @@ namespace CityLife.World.Editor
         {
             "Assets/CityLife/Scripts/KokerboomGeometry.cs",
             "Assets/CityLife/Shaders/KokerboomSurface.shader",
+            "Assets/CityLife/Shaders/KokerboomBranchSkin.hlsl",
             "Assets/CityLife/Shaders/PH02FittedSupport.shader",
             "Assets/CityLife/Editor/KokerboomValidation.cs",
             "Assets/CityLife/Editor/PH02FamilyComponent.cs",

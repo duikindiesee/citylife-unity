@@ -33,6 +33,7 @@ Shader "CityLife/KokerboomSurface"
             #pragma multi_compile_instancing
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "KokerboomBranchSkin.hlsl"
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseColor,_BaseMap_ST;
                 float _IsLeaf,_Smoothness,_Cutoff,_Cull;
@@ -124,10 +125,7 @@ Shader "CityLife/KokerboomSurface"
                         // Upper shoots have pale powdery skin. Projecting an entire
                         // curved branch through a trunk polar angle stretched its map
                         // into horizontal bands; this local surface has no polar seam.
-                        float mottling=noise(i.positionOS.xy*8+i.positionOS.z*3);
-                        float powder=noise(i.positionOS.yz*47+i.positionOS.x*7);
-                        float3 pale=lerp(float3(.48,.40,.235),float3(.66,.57,.38),mottling);
-                        pale*=lerp(.96,1.04,powder);
+                        float3 pale=KokerboomBranchSkin(i.positionOS);
                         sourceColor*=float3(1.13,1.055,.86);
                         albedo=lerp(pale,sourceColor,trunk);
                         n=normalize(n+TransformObjectToWorldDir(gradient,false)*.48*trunk);

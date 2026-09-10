@@ -15,6 +15,7 @@ Shader "CityLife/PH02FittedSupport"
         _DiagnosticGray("Gray surface diagnostic",Float)=0
         _DiagnosticAlbedo("Albedo diagnostic",Float)=0
         _FoliageTintStrength("Blue-green foliage art tint",Range(0,1))=0
+        _MatchTreeSkin("Use shared tree branch skin",Float)=0
     }
     SubShader
     {
@@ -34,9 +35,10 @@ Shader "CityLife/PH02FittedSupport"
             #pragma multi_compile_instancing
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "KokerboomBranchSkin.hlsl"
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseMap_ST,_BaseColor,_PaleColor;
-                float _BumpScale,_Smoothness,_PaleSmoothness,_Cull,_Cutoff,_DiagnosticGray,_DiagnosticAlbedo,_FoliageTintStrength;
+                float _BumpScale,_Smoothness,_PaleSmoothness,_Cull,_Cutoff,_DiagnosticGray,_DiagnosticAlbedo,_FoliageTintStrength,_MatchTreeSkin;
             CBUFFER_END
             TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
             TEXTURE2D(_BumpMap); SAMPLER(sampler_BumpMap);
@@ -52,6 +54,7 @@ Shader "CityLife/PH02FittedSupport"
                 float4 positionCS:SV_POSITION; float3 positionWS:TEXCOORD0;
                 float3 normalWS:TEXCOORD1; float4 tangentWS:TEXCOORD2;
                 float2 uv:TEXCOORD3; float blend:TEXCOORD4; float fog:TEXCOORD5; float foliage:TEXCOORD6;
+                float3 positionOS:TEXCOORD7;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
             Varyings Vert(Attributes v)
@@ -59,7 +62,7 @@ Shader "CityLife/PH02FittedSupport"
                 Varyings o; UNITY_SETUP_INSTANCE_ID(v); UNITY_TRANSFER_INSTANCE_ID(v,o);
                 VertexPositionInputs p=GetVertexPositionInputs(v.positionOS.xyz);
                 VertexNormalInputs n=GetVertexNormalInputs(v.normalOS,v.tangentOS);
-                o.positionCS=p.positionCS; o.positionWS=p.positionWS; o.normalWS=n.normalWS;
+                o.positionCS=p.positionCS; o.positionWS=p.positionWS; o.positionOS=v.positionOS.xyz; o.normalWS=n.normalWS;
                 o.tangentWS=float4(n.tangentWS,v.tangentOS.w*GetOddNegativeScale());
                 o.uv=TRANSFORM_TEX(v.uv,_BaseMap); o.blend=saturate(v.color.r); o.foliage=saturate(v.color.g);
                 o.fog=ComputeFogFactor(p.positionCS.z); return o;
@@ -75,9 +78,15 @@ Shader "CityLife/PH02FittedSupport"
                 // Explicit art treatment, limited by caller-supplied geometric foliage
                 // weights and green-biased albedo. Brown damage and support skin remain.
                 // This heuristic is not a publisher semantic mask or measured biology.
-                float green=smoothstep(.002,.022,source.g-source.r*.86);
+                // A narrow green-channel threshold amplified texture compression
+                // blocks into cyan squares. Use the geometric leaf weight for the
+                // coating and smoothly retain only strongly brown damaged areas.
+                float green=1-smoothstep(.075,.28,source.r-source.g);
                 float luminance=dot(source,float3(.2126,.7152,.0722));
-                float3 blueGreen=luminance*float3(.48,1.08,1.03);
+                // A diffuse glaucous coating lifts the very dark photographed leaf
+                // albedo while preserving its tonal variation. No emission or extra
+                // scene light is used; brown damage retains the source treatment.
+                float3 blueGreen=float3(.035,.060,.062)+sqrt(saturate(luminance))*float3(.25,.52,.54);
                 source=lerp(source,blueGreen,saturate(_FoliageTintStrength*i.foliage*green));
                 float gloss=SAMPLE_TEXTURE2D(_MetallicGlossMap,sampler_MetallicGlossMap,i.uv).a*_Smoothness;
                 float3 normalTS=UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap,sampler_BumpMap,i.uv),_BumpScale);
@@ -88,6 +97,7 @@ Shader "CityLife/PH02FittedSupport"
                 float3 n=NormalizeNormalPerPixel(TransformTangentToWorld(normalTS,half3x3(tangent,bitangent,geometricNormal)));
                 float powder=sin(i.positionWS.x*173+i.positionWS.y*83)*sin(i.positionWS.z*127-i.positionWS.y*61);
                 float3 pale=_PaleColor.rgb*(1+.018*powder);
+                if(_MatchTreeSkin>.5)pale=KokerboomBranchSkin(i.positionOS);
                 float3 albedo=lerp(source,pale,blend);
                 gloss=lerp(gloss,_PaleSmoothness,blend);
                 if(_DiagnosticGray>.5) { albedo=.32; gloss=.1; n=geometricNormal; }

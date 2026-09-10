@@ -10,6 +10,7 @@ param(
     [switch]$PH01Tangents,
     [switch]$PH02Fitted,
     [switch]$PH02Family,
+    [string]$PH02Shots,
     [ValidateRange(0,1)][float]$PH02FoliageTint=0,
     [switch]$PH02ImportedTuples,
     [switch]$WoodDiagnostic,
@@ -37,6 +38,44 @@ New-Item -ItemType Directory -Force -Path $localLogs | Out-Null
 $stamp = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss')
 $logPath = Join-Path $localLogs "kokerboom-$Round-$stamp.log"
 if(([int]$ImportedCandidates.IsPresent+[int]$Hybrid.IsPresent+[int]$PlayablePreview.IsPresent+[int]$PH02Crown.IsPresent+[int]$PH01Tangents.IsPresent+[int]$PH02Fitted.IsPresent+[int]$WoodDiagnostic.IsPresent+[int]$PH02Family.IsPresent) -gt 1){throw 'Select one inspection mode.'}
+# Optional PH02 shot subset; all existing 21 shots remain the default.
+$ph02ShotSelectionRequested=$PSBoundParameters.ContainsKey('PH02Shots')
+$ph02SelectedNumbers=@()
+if($ph02ShotSelectionRequested){
+    if(-not $PH02Family){throw 'PH02Shots applies only to PH02Family.'}
+    if([string]::IsNullOrWhiteSpace($PH02Shots)){throw 'PH02Shots must contain comma-separated two-digit shot numbers, e.g. 05,08,13,18,20,21.'}
+    $ph02SelectedNumbers=@($PH02Shots.Split(',') | ForEach-Object { $_.Trim() })
+    if(@($ph02SelectedNumbers | Where-Object { $_ -notmatch '^(0[1-9]|1[0-9]|2[01])$' }).Count){throw 'PH02Shots must name existing PH02 family shots 01 through 21.'}
+    if(@($ph02SelectedNumbers | Select-Object -Unique).Count -ne $ph02SelectedNumbers.Count){throw 'PH02Shots must not contain duplicate shot numbers.'}
+    $ph02SelectedNumbers=@($ph02SelectedNumbers | Sort-Object)
+}
+# End optional PH02 selection validation.
+# Reference fields are compared after capture, not replayed. This does not
+# assert matrix equality: R16 records camera settings, not view/projection matrices.
+$ph02CameraReference=$null
+if($ph02ShotSelectionRequested){
+    $ph02CameraReferencePath=Join-Path $projectPath 'evidence/milestones/kokerboom/round-16/metrics.json'
+    $ph02CameraReferenceHash=(Get-FileHash -LiteralPath $ph02CameraReferencePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $ph02CameraReference=Get-Content -LiteralPath $ph02CameraReferencePath -Raw | ConvertFrom-Json
+    if(-not $ph02CameraReference.technicalChecksPassed -or @($ph02CameraReference.captures).Count -ne 21){throw 'The recorded R16 camera catalogue is required for scoped PH02 comparisons.'}
+}
+function Get-PH02CameraDifference {
+    param($Actual,$Reference)
+    $different=@();$deltas=[ordered]@{}
+    foreach($group in @('position','rotationEuler')){foreach($axis in @('x','y','z')){
+        $a=[double]$Actual.camera.$group.$axis;$b=[double]$Reference.camera.$group.$axis
+        $name="$group.$axis";$deltas[$name]=$a-$b;if($a -ne $b){$different+=$name}
+    }}
+    foreach($name in @('orthographicSizeMetres','fieldOfView','nearClip','farClip')){
+        $a=[double]$Actual.camera.$name;$b=[double]$Reference.camera.$name
+        $deltas[$name]=$a-$b;if($a -ne $b){$different+=$name}
+    }
+    $projectionSame=$Actual.camera.orthographic -eq $Reference.camera.orthographic
+    if(-not $projectionSame){$different+='orthographic'}
+    $dimensionsSame=$Actual.widthPixels -eq $Reference.widthPixels -and $Actual.heightPixels -eq $Reference.heightPixels
+    if(-not $dimensionsSame){$different+='imageDimensions'}
+    return [pscustomobject]@{id=$Actual.id;recordedFieldsExactlyEqual=$different.Count -eq 0;differentFields=@($different);signedActualMinusReference=$deltas;projectionModeSame=$projectionSame;imageDimensionsSame=$dimensionsSame}
+}
 if($PSBoundParameters.ContainsKey('PH02FoliageTint') -and -not $PH02Family){throw 'PH02FoliageTint applies only to the PH02Family comparison.'}
 if($ExactTupleDedup -and -not $PH01Tangents){throw 'ExactTupleDedup applies only to the PH01Tangents comparison.'}
 if($PH02ImportedTuples -and -not $PH02Fitted){throw 'PH02ImportedTuples applies only to PH02Fitted; the default source path is unchanged.'}
@@ -44,7 +83,7 @@ if($PH02ImportedTuples -and $Width -ne 1600){throw 'PH02ImportedTuples retains t
 if($PH02Fitted -and $PSBoundParameters.ContainsKey('PH02CutHeight')){throw 'PH02Fitted uses the recorded source cut at0.65m; the free cut parameter belongs to PH02Crown.'}
 if($WoodDiagnostic -and $Seed -ne 4242){throw 'WoodDiagnostic preserves the R09 seed4242 main specimen.'}
 $entryPoint = if($PH02Family) { 'CityLife.World.Editor.KokerboomRender.RenderPH02Family' } elseif($WoodDiagnostic) { 'CityLife.World.Editor.KokerboomRender.RenderWoodDiagnostic' } elseif($PH02Fitted) { 'CityLife.World.Editor.KokerboomRender.RenderPH02FittedSupport' } elseif($PH01Tangents) { 'CityLife.World.Editor.KokerboomRender.RenderPH01TangentComparison' } elseif($PH02Crown) { 'CityLife.World.Editor.KokerboomRender.RenderPH02CrownCandidate' } elseif($PlayablePreview) { 'CityLife.World.Editor.KokerboomRender.BuildPlayablePreview' } elseif ($ImportedCandidates) { 'CityLife.World.Editor.KokerboomRender.RenderImportedCandidates' } elseif($Hybrid) { 'CityLife.World.Editor.KokerboomRender.RenderHybridFamily' } else { 'CityLife.World.Editor.KokerboomRender.RenderBatch' }
-$expectedCaptures = if($PH02Family) { 21 } elseif($WoodDiagnostic) { 3 } elseif($PH02Fitted) { 12 } elseif($PH01Tangents -or $PH02Crown) { 8 } elseif($PlayablePreview) { 2 } elseif ($ImportedCandidates) { 12 } elseif($Hybrid) { 21 } else { 15 }
+$expectedCaptures = if($ph02ShotSelectionRequested) { $ph02SelectedNumbers.Count } elseif($PH02Family) { 21 } elseif($WoodDiagnostic) { 3 } elseif($PH02Fitted) { 12 } elseif($PH01Tangents -or $PH02Crown) { 8 } elseif($PlayablePreview) { 2 } elseif ($ImportedCandidates) { 12 } elseif($Hybrid) { 21 } else { 15 }
 $arguments = @('-batchmode', '-force-d3d11', '-projectPath', ('"' + $projectPath + '"'),
     '-executeMethod', $entryPoint,
     '-kokerboomRound', $Round, '-kokerboomSeed', $Seed.ToString([Globalization.CultureInfo]::InvariantCulture),
@@ -54,6 +93,7 @@ if($PH02Crown){$arguments+=@('-ph02CutHeight',$PH02CutHeight.ToString('R',[Globa
 if($PH01Tangents){$arguments+=@('-ph01ExactTupleDedup',([int]$ExactTupleDedup.IsPresent).ToString([Globalization.CultureInfo]::InvariantCulture))}
 if($PH02Fitted){$arguments+=@('-ph02ImportedTuples',([int]$PH02ImportedTuples.IsPresent).ToString([Globalization.CultureInfo]::InvariantCulture))}
 if($PH02Family){$arguments+=@('-ph02FoliageTint',$PH02FoliageTint.ToString('R',[Globalization.CultureInfo]::InvariantCulture))}
+if($ph02ShotSelectionRequested){$arguments+=@('-ph02Shots',($ph02SelectedNumbers -join ','))}
 # Graphics remain enabled. Batch mode + a hidden process do not activate a desktop editor window.
 # The render entry point exits the process itself; -quit and -nographics are deliberately absent.
 $renderProcess = Start-Process -FilePath $EditorPath -ArgumentList $arguments -WindowStyle Hidden -PassThru
@@ -71,8 +111,17 @@ if ($exitCode -ne 0 -or -not (Test-Path -LiteralPath $metricsPath)) {
     throw "Kokerboom rendering failed (exit $exitCode). Existing evidence is retained. Inspect $logPath"
 }
 $report = Get-Content -Raw -LiteralPath $metricsPath | ConvertFrom-Json
-if($PH02Family -and ($report.mode -ne 'hybrid-ph02-fitted-crown-family-experiment' -or -not $report.ph02FamilyChecks.numericChecksPassed -or -not $report.ph02FamilyChecks.actualImportedGatePassed -or -not $report.ph02FamilyMeshReadbackPassed -or $report.ph02FoliageTintStrength -ne $PH02FoliageTint)){
+$expectedPH02Mode=if($ph02ShotSelectionRequested){'hybrid-ph02-fitted-crown-scoped-inspection'}else{'hybrid-ph02-fitted-crown-family-experiment'}
+if($PH02Family -and ($report.mode -ne $expectedPH02Mode -or -not $report.ph02FamilyChecks.numericChecksPassed -or -not $report.ph02FamilyChecks.actualImportedGatePassed -or -not $report.ph02FamilyMeshReadbackPassed -or $report.ph02FoliageTintStrength -ne $PH02FoliageTint)){
     throw 'PH02 family component or requested tint did not pass the recorded technical checks. Component checks do not constitute full-family acceptance.'
+}
+if($PH02Family){
+    $actualIds=@($report.captures | ForEach-Object { [string]$_.id })
+    $actualNumbers=@($actualIds | ForEach-Object { $_.Substring(0,2) })
+    $expectedNumbers=if($ph02ShotSelectionRequested){$ph02SelectedNumbers}else{@(1..21 | ForEach-Object { $_.ToString('00',[Globalization.CultureInfo]::InvariantCulture) })}
+    if($report.ph02ShotSelectionRequested -ne $ph02ShotSelectionRequested -or (@($report.ph02SelectedShotIds) -join ',') -cne ($actualIds -join ',') -or ($actualNumbers -join ',') -cne ($expectedNumbers -join ',')){
+        throw 'PH02 selected IDs, canonical capture order or scoped/full mode did not match the request. Existing evidence is preserved.'
+    }
 }
 if($PH02Fitted -and ($report.mode -ne 'ph02-fitted-support-comparison' -or -not $report.ph02FittedChecks.numericChecksPassed -or -not $report.ph02FittedReadback.passed)){
     throw "PH02 fitted support failed its actual Create/shared-rim readback checks. Inspect $metricsPath and ph02-fitted-support-checks.json."
@@ -91,11 +140,31 @@ if($PH01Tangents){
 if (-not $report.technicalChecksPassed -or $report.expectedCaptures -ne $expectedCaptures -or @($report.captures).Count -ne $expectedCaptures) {
     throw "Render evidence did not pass its technical checks. Inspect $metricsPath and $logPath"
 }
+$ph02CameraComparisonPath=$null
+if($ph02ShotSelectionRequested){
+    $comparisons=@(foreach($capture in $report.captures){
+        $baseline=@($ph02CameraReference.captures | Where-Object { $_.id -ceq $capture.id })
+        if($baseline.Count -ne 1){throw "R16 must contain one camera reference for selected shot $($capture.id). Existing images remain preserved."}
+        Get-PH02CameraDifference -Actual $capture -Reference $baseline[0]
+    })
+    $ph02CameraComparisonPath=Join-Path $outputDirectory 'ph02-shot-camera-comparison.json'
+    [pscustomobject]@{
+        schema='starfall.ph02-selected-shot-camera-fields.v1'
+        scope='Same-view categories, not a replay. Camera functions are unchanged but bounds-dependent fields can differ. Signed raw Euler deltas are not quaternion-angle differences. Inactive orthographic/perspective fields are retained. R16 did not record camera matrices; no matrix equality, lighting equality, geometry parity or full-family acceptance inferred.'
+        referenceManifest='evidence/milestones/kokerboom/round-16/metrics.json'
+        referenceManifestSha256=$ph02CameraReferenceHash
+        actualManifestSha256=(Get-FileHash -LiteralPath $metricsPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        selectedShotIds=@($report.ph02SelectedShotIds)
+        comparisons=$comparisons
+    } | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $ph02CameraComparisonPath -Encoding utf8NoBOM
+}
 [pscustomobject]@{
-    status = 'Rendered for independent critique'
+    status = if($ph02ShotSelectionRequested){'Rendered scoped PH02 inspection; not a full-family review set'}else{'Rendered for independent critique'}
     round = $Round
     images = @($report.captures).Count
     metrics = $metricsPath
     log = $logPath
-    visualAcceptance = 'Not scored; independent critique required.'
+    cameraComparison = $ph02CameraComparisonPath
+    visualAcceptance = if($ph02ShotSelectionRequested){'Not scored; selected shots are not a full-family evidence set.'}else{'Not scored; independent critique required.'}
+    selectedShotIds = if($PH02Family){@($report.ph02SelectedShotIds)}else{@()}
 } | ConvertTo-Json

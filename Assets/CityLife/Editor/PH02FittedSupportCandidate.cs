@@ -22,6 +22,7 @@ namespace CityLife.World.Editor
             public float roundRadiusScale = 1.12f, bottomRadiusScale = 1.12f;
             public Vector2 lowerBendMetres = new Vector2(.045f, .020f);
             public int transitionSegments = 16, lowerSegments = 8;
+            public bool flatLowerTangent;
         }
         public sealed class Result : IDisposable
         {
@@ -69,7 +70,7 @@ namespace CityLife.World.Editor
             public float minimumFaceNormalDot = 1f, maximumRadiusOverEndpointEnvelope;
             public double minimumTriangleArea = double.PositiveInfinity;
             public bool sourceTangentsAvailable, ringOrderedConnectivity, allCutEdgesReversed, crownUnchanged;
-            public bool finiteNormals, nondegenerate, windingConsistent, numericChecksPassed;
+            public bool finiteNormals, nondegenerate, windingConsistent, numericChecksPassed, flatLowerTangent;
         }
 
         public static Result Create(Options options = null)
@@ -242,6 +243,7 @@ namespace CityLife.World.Editor
                 targetDerivative[i] = (LowerPoint(i, o.transitionMetres + epsilon) - LowerPoint(i, o.transitionMetres - epsilon)) / (2 * epsilon);
             }
             int rows = o.transitionSegments + o.lowerSegments + 1; report.ringCount = rows;
+            report.flatLowerTangent=o.flatLowerTangent;
             var depths = new float[rows]; var positions = new Vector3[rows, count]; var normals = new Vector3[rows, count];
             for (int row = 0; row < rows; row++)
             {
@@ -272,6 +274,8 @@ namespace CityLife.World.Editor
                 // Ring follows the crown's directed lower boundary. The support reverses that
                 // edge, so this normal must agree with the copied source normal at the rim.
                 if (Vector3.Dot(normal, positions[row, i] - Centre(depths[row])) < 0) normal = -normal;
+                if(o.flatLowerTangent&&row==rows-1)
+                    normal=(positions[row,i]-Centre(depths[row])).normalized;
                 Require(normal.sqrMagnitude > .9f, "Collapsed support differential.");
                 normals[row, i] = normal;
             }
@@ -330,7 +334,12 @@ namespace CityLife.World.Editor
                 Vector3 axis = new Vector3(2 * o.lowerBendMetres.x * depth / (length * length), -1, 2 * o.lowerBendMetres.y * depth / (length * length)).normalized;
                 Vector3 right = (Vector3.right - Vector3.Dot(Vector3.right, axis) * axis).normalized;
                 Vector3 forward = Vector3.Cross(axis, right).normalized;
-                float r = radius * (1f + (o.bottomRadiusScale - 1f) * (depth - o.transitionMetres) / o.lowerExtensionMetres);
+                float taper=(depth-o.transitionMetres)/o.lowerExtensionMetres;
+                // Family attachment only: a zero radial slope at the lower rim
+                // lets the wood endpoint cap sit inside the tube. The original
+                // R13 component path retains its recorded linear taper.
+                if(o.flatLowerTangent)taper=Smooth(Mathf.Clamp01(taper));
+                float r = radius * (1f + (o.bottomRadiusScale - 1f) * taper);
                 return Centre(depth) + (right * radial[point].x + forward * radial[point].z) * r;
             }
         }

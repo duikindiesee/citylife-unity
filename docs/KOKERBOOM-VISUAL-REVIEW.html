@@ -65,13 +65,14 @@
 <main>
   <header>
     <div class="eyebrow">Kooker: Starfall · Preserved render catalogue</div>
-    <h1>Kokerboom, under review.</h1>
-    <p class="intro">Compare actual Unity output across six full critique rounds. Every image links to its unchanged original; the scores below are independent visual judgements, not a promise of botanical exactness.</p>
+    <h1>Kokerboom, preserved.</h1>
+    <p class="intro">Compare actual Unity output across seven preserved full critique rounds, including the frozen R19 experiment. Every image links to its unchanged original; the scores below are independent visual judgements, not a promise of botanical exactness.</p>
     <nav class="links" aria-label="Review documents">
+      <a href="TREE-BASELINE.md">R06 baseline and freeze</a>
       <a href="KOKERBOOM-CRITIQUE.md">Critique and full evidence</a>
       <a href="VISUAL-MILESTONES.md">Visual milestone record</a>
     </nav>
-    <div class="gate"><strong>All six rounds rejected.</strong> Acceptance requires botanical and art means of at least <strong>9/10</strong>, all six criteria verified, the full evidence set, and no major defect.</div>
+    <div class="gate"><strong>R06 is the user-approved visual reference.</strong> R19 is a separate frozen experiment, scored 7.375/10 (7.4 displayed) and rejected under that rubric. The historical 9/10 rubric remains evaluation history, not a world-work gate. Remaining defects are deferred; no further polishing rounds.</div>
   </header>
 
   <section aria-label="Compare preserved renders">
@@ -86,30 +87,30 @@
       </label>
     </div>
     <p class="quiet">View categories match; camera and lighting settings can differ between rounds. Check each capture manifest before treating a pair as a controlled comparison.</p>
-    <noscript><p>JavaScript is disabled. The preserved R09 and R16 neutral-front images and scores remain available below. The critique document links every original view.</p></noscript>
+    <noscript><p>JavaScript is disabled. The preserved R16 and R19 neutral-front images remain below; R19 scored 7.375/10. The critique document links every original view.</p></noscript>
     <div class="comparison">
       <article class="card" aria-label="Left comparison">
         <div class="card-head">
           <label for="round-left">Left round
-            <select id="round-left"><option value="01">R01 · 3.75 overall</option><option value="02">R02 · 4.75 overall</option><option value="04">R04 · 5.25 overall</option><option value="07">R09 · 4.75 overall</option><option value="09" selected>R09 · 5.5 overall</option><option value="16">R16 · 5.75 overall</option></select>
+            <select id="round-left"><option value="01">R01 · 3.75 overall</option><option value="02">R02 · 4.75 overall</option><option value="04">R04 · 5.25 overall</option><option value="07">R07 · 4.75 overall</option><option value="09">R09 · 5.5 overall</option><option value="16" selected>R16 · 5.75 overall</option><option value="19">R19 · 7.375 overall</option></select>
           </label>
-          <span class="badge">Rejected</span>
+          <span class="badge" id="badge-left">Rejected</span>
         </div>
         <figure>
-          <div class="frame" id="frame-left"><a id="image-link-left" href="../evidence/milestones/kokerboom/round-09/2026-09-10-01-neutral-front.png"><img id="image-left" src="../evidence/milestones/kokerboom/round-09/2026-09-10-01-neutral-front.png" width="1600" height="1200" alt="R09 actual Unity render: neutral front of the rejected hybrid kokerboom."></a></div>
-          <figcaption><span class="view-title" id="caption-left">R09 · Neutral front</span><span id="note-left">Broader crown, shorter terminal wood and repaired mapping. Geometric trunk bands, blurred bark, a pale bell-like juvenile, mechanical primary limbs and weak teal leaf mass remain.</span><div class="card-links"><a id="original-left" href="../evidence/milestones/kokerboom/round-09/2026-09-10-01-neutral-front.png">Open original PNG</a><a id="manifest-left" href="../evidence/milestones/kokerboom/round-09/metrics.json">Capture manifest</a></div></figcaption>
+          <div class="frame" id="frame-left"><a id="image-link-left" href="../evidence/milestones/kokerboom/round-16/2026-09-10-01-neutral-front.png"><img id="image-left" src="../evidence/milestones/kokerboom/round-16/2026-09-10-01-neutral-front.png" width="1600" height="1200" alt="R16 actual Unity offscreen neutral front; historically rejected."></a></div>
+          <figcaption><span class="view-title" id="caption-left">R16 · Neutral front</span><span id="note-left">Fuller PH02 rosettes retained. Contrasting support/wood rims, stepped bend shading, repeated scars, weak peeling, abrupt bases and olive rather than blue-green foliage block acceptance.</span><div class="card-links"><a id="original-left" href="../evidence/milestones/kokerboom/round-16/2026-09-10-01-neutral-front.png">Open original PNG</a><a id="manifest-left" href="../evidence/milestones/kokerboom/round-16/metrics.json">Capture manifest</a></div></figcaption>
         </figure>
       </article>
       <article class="card" aria-label="Right comparison">
         <div class="card-head">
           <label for="round-right">Right round
-            <select id="round-right"><option value="01">R01 · 3.75 overall</option><option value="02">R02 · 4.75 overall</option><option value="04">R04 · 5.25 overall</option><option value="07">R16 · 4.75 overall</option><option value="09">R16 · 5.5 overall</option><option value="16" selected>R16 · 5.75 overall</option></select>
+            <select id="round-right"><option value="01">R01 · 3.75 overall</option><option value="02">R02 · 4.75 overall</option><option value="04">R04 · 5.25 overall</option><option value="07">R07 · 4.75 overall</option><option value="09">R09 · 5.5 overall</option><option value="16">R16 · 5.75 overall</option><option value="19" selected>R19 · 7.375 overall</option></select>
           </label>
-          <span class="badge">Rejected</span>
+          <span class="badge" id="badge-right">Rejected</span>
         </div>
         <figure>
-          <div class="frame" id="frame-right"><a id="image-link-right" href="../evidence/milestones/kokerboom/round-16/2026-09-10-01-neutral-front.png"><img id="image-right" src="../evidence/milestones/kokerboom/round-16/2026-09-10-01-neutral-front.png" width="1600" height="1200" alt="R16 actual Unity render: neutral front of the rejected hybrid kokerboom."></a></div>
-          <figcaption><span class="view-title" id="caption-right">R16 · Neutral front</span><span id="note-right">Fuller PH02 rosettes retained. Contrasting support/wood rims, stepped bend shading, repeated scars, weak peeling, abrupt bases and olive rather than blue-green foliage block acceptance.</span><div class="card-links"><a id="original-right" href="../evidence/milestones/kokerboom/round-16/2026-09-10-01-neutral-front.png">Open original PNG</a><a id="manifest-right" href="../evidence/milestones/kokerboom/round-16/metrics.json">Capture manifest</a></div></figcaption>
+          <div class="frame" id="frame-right"><a id="image-link-right" href="../evidence/milestones/kokerboom/round-19/2026-09-10-01-neutral-front.png"><img id="image-right" src="../evidence/milestones/kokerboom/round-19/2026-09-10-01-neutral-front.png" width="1600" height="1200" alt="R19 actual Unity offscreen neutral front; historically rejected and frozen."></a></div>
+          <figcaption><span class="view-title" id="caption-right">R19 · Neutral front</span><span id="note-right">Frozen experimental PH02 family: continuous blue-green foliage and improved shared skin/juvenile contact. Angular bends, a small junction rim, repeated scars/rosettes, uniform cyan weathering and distance readability remain deferred. R06 stays the approved visual reference.</span><div class="card-links"><a id="original-right" href="../evidence/milestones/kokerboom/round-19/2026-09-10-01-neutral-front.png">Open original PNG</a><a id="manifest-right" href="../evidence/milestones/kokerboom/round-19/metrics.json">Capture manifest</a></div></figcaption>
         </figure>
       </article>
     </div>
@@ -120,26 +121,26 @@
     <div class="table-scroll">
       <table>
         <caption>Full-round scores use all required evidence, not only the selected pair of images.</caption>
-        <thead><tr><th scope="col">Fixed criterion order</th><th scope="col" id="score-left">R09</th><th scope="col" id="score-right">R16</th></tr></thead>
+        <thead><tr><th scope="col">Fixed criterion order</th><th scope="col" id="score-left">R16</th><th scope="col" id="score-right">R19</th></tr></thead>
         <tbody id="score-body">
-          <tr><td>1 · Anatomy and silhouette</td><td>7</td><td>7.5</td></tr>
-          <tr><td>2 · Joins and surface</td><td>6</td><td>5</td></tr>
-          <tr><td>3 · Rosettes and leaves</td><td>7</td><td>8</td></tr>
-          <tr><td>4 · Age and size variation</td><td>5.5</td><td>6.5</td></tr>
-          <tr><td>5 · Palette and light identity</td><td>5.5</td><td>5.5</td></tr>
-          <tr><td>6 · In-world readability</td><td>5.5</td><td>6</td></tr>
-          <tr class="mean"><td>Botanical mean · criteria 1–4</td><td>6.375</td><td>6.75</td></tr>
-          <tr class="mean"><td>Art mean · criteria 5–6</td><td>5.5</td><td>5.75</td></tr>
-          <tr class="overall"><td>Overall · lower mean</td><td>5.5</td><td>5.75</td></tr>
+          <tr><td>1 · Anatomy and silhouette</td><td>7.5</td><td>7.5</td></tr>
+          <tr><td>2 · Joins and surface</td><td>5</td><td>7</td></tr>
+          <tr><td>3 · Rosettes and leaves</td><td>8</td><td>8</td></tr>
+          <tr><td>4 · Age and size variation</td><td>6.5</td><td>7</td></tr>
+          <tr><td>5 · Palette and light identity</td><td>5.5</td><td>7.5</td></tr>
+          <tr><td>6 · In-world readability</td><td>6</td><td>7.5</td></tr>
+          <tr class="mean"><td>Botanical mean · criteria 1–4</td><td>6.75</td><td>7.375</td></tr>
+          <tr class="mean"><td>Art mean · criteria 5–6</td><td>5.75</td><td>7.5</td></tr>
+          <tr class="overall"><td>Overall · lower mean</td><td>5.75</td><td>7.375</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="quiet" id="comparison-status" aria-live="polite">R09 and R16 are rejected. A later round is not automatically an improvement.</p>
+    <p class="quiet" id="comparison-status" aria-live="polite">R16: rejected under the historical rubric. R19: rejected under the historical rubric and frozen. R06 remains the approved reference.</p>
   </section>
 
   <section class="component-studies" id="component-studies" aria-labelledby="component-studies-title">
     <h2 id="component-studies-title">Component studies — not full-family scores</h2>
-    <p class="quiet">Reviewed actual Unity before/after views. These isolated repairs receive no new scores here and do not change the latest full-family result: R16, 5.75/10, rejected. See the <a href="KOKERBOOM-CRITIQUE.md">critique record</a> and each capture manifest for scope.</p>
+    <p class="quiet">Reviewed actual Unity before/after views. These isolated repairs receive no new scores here and do not change historical full-family scores. R16 was rejected at 5.75/10; R19 is frozen at 7.375/10; remaining defects are deferred. See the <a href="KOKERBOOM-CRITIQUE.md">critique record</a> and each capture manifest for scope.</p>
 
     <article class="study" id="study-trunk" aria-labelledby="study-trunk-title">
       <h3 id="study-trunk-title">Trunk shape · R09 → R11</h3>
@@ -191,7 +192,7 @@
 
   <div class="notes">
     <section><h2>What these images establish</h2><p class="quiet">Actual Unity offscreen renders of specimens and a populated prototype patch, retaining their original CityLife Unity provenance. Native walking, presented game frames and performance are separate acceptance checks; numerical tests do not increase visual scores.</p></section>
-    <section><h2>Keep scoped studies separate</h2><p class="quiet">R03 imported-asset comparisons, R06 preview studies and R08 scoped studies are excluded from full-round arithmetic. R05 has no full acceptance score in this catalogue. Earlier images and failed rounds remain preserved.</p></section>
+    <section><h2>Keep scoped studies separate</h2><p class="quiet">R03 imported comparisons, R06 preview studies and R08/R17/R18 scoped studies are excluded from full-round arithmetic. The user-approved R06 visual reference is distinct from critic scoring. R05 has no full acceptance score in this catalogue. Earlier images and failed rounds remain preserved.</p></section>
   </div>
   <footer>Review snapshot · 10 September 2026. No external scripts, fonts or network services. This catalogue links existing evidence and does not alter the images.</footer>
 </main>
@@ -232,7 +233,8 @@
         "gameplay": "../evidence/milestones/kokerboom/round-01/2026-09-10-08-cosmic-gameplay-eye-level.png",
         "bark": "../evidence/milestones/kokerboom/round-01/2026-09-10-05-trunk-bark-closeup.png",
         "rosette": "../evidence/milestones/kokerboom/round-01/2026-09-10-06-terminal-rosette-closeup.png"
-      }
+      },
+      "status": "rejected"
     },
     "02": {
       "scores": [
@@ -253,7 +255,8 @@
         "gameplay": "../evidence/milestones/kokerboom/round-02/2026-09-10-08-cosmic-gameplay-eye-level.png",
         "bark": "../evidence/milestones/kokerboom/round-02/2026-09-10-05-trunk-bark-closeup.png",
         "rosette": "../evidence/milestones/kokerboom/round-02/2026-09-10-06-terminal-rosette-closeup.png"
-      }
+      },
+      "status": "rejected"
     },
     "04": {
       "scores": [
@@ -274,7 +277,8 @@
         "gameplay": "../evidence/milestones/kokerboom/round-04/2026-09-10-08-cosmic-gameplay-eye-level.png",
         "bark": "../evidence/milestones/kokerboom/round-04/2026-09-10-05-trunk-bark-closeup.png",
         "rosette": "../evidence/milestones/kokerboom/round-04/2026-09-10-06-terminal-rosette-closeup.png"
-      }
+      },
+      "status": "rejected"
     },
     "07": {
       "scores": [
@@ -295,7 +299,8 @@
         "gameplay": "../evidence/milestones/kokerboom/round-07/2026-09-10-08-cosmic-gameplay-eye-level.png",
         "bark": "../evidence/milestones/kokerboom/round-07/2026-09-10-05-trunk-bark-closeup.png",
         "rosette": "../evidence/milestones/kokerboom/round-07/2026-09-10-06-terminal-rosette-closeup.png"
-      }
+      },
+      "status": "rejected"
     },
     "09": {
       "scores": [
@@ -316,7 +321,8 @@
         "gameplay": "../evidence/milestones/kokerboom/round-09/2026-09-10-08-cosmic-gameplay-eye-level.png",
         "bark": "../evidence/milestones/kokerboom/round-09/2026-09-10-05-trunk-bark-closeup.png",
         "rosette": "../evidence/milestones/kokerboom/round-09/2026-09-10-06-terminal-rosette-closeup.png"
-      }
+      },
+      "status": "rejected"
     },
     "16": {
       "scores": [
@@ -337,6 +343,29 @@
         "gameplay": "../evidence/milestones/kokerboom/round-16/2026-09-10-08-cosmic-gameplay-eye-level.png",
         "bark": "../evidence/milestones/kokerboom/round-16/2026-09-10-05-trunk-bark-closeup.png",
         "rosette": "../evidence/milestones/kokerboom/round-16/2026-09-10-06-terminal-rosette-closeup.png"
+      },
+      "status": "rejected"
+    },
+    "19": {
+      "scores": [
+        7.5,
+        7,
+        8,
+        7,
+        7.5,
+        7.5
+      ],
+      "botanical": 7.375,
+      "art": 7.5,
+      "overall": 7.375,
+      "status": "rejected",
+      "note": "Frozen experimental PH02 family: continuous blue-green foliage and improved shared skin/juvenile contact. Angular bends, a small junction rim, repeated scars/rosettes, uniform cyan weathering and distance readability remain deferred. R06 stays the approved visual reference.",
+      "manifest": "../evidence/milestones/kokerboom/round-19/metrics.json",
+      "images": {
+        "front": "../evidence/milestones/kokerboom/round-19/2026-09-10-01-neutral-front.png",
+        "gameplay": "../evidence/milestones/kokerboom/round-19/2026-09-10-08-cosmic-gameplay-eye-level.png",
+        "bark": "../evidence/milestones/kokerboom/round-19/2026-09-10-05-trunk-bark-closeup.png",
+        "rosette": "../evidence/milestones/kokerboom/round-19/2026-09-10-06-terminal-rosette-closeup.png"
       }
     }
   }
@@ -355,7 +384,8 @@
       const path = round.images[view];
       const image = byId("image-" + side);
       image.src = path;
-      image.alt = "R" + roundId + " actual Unity offscreen render: " + review.views[view] + ". Rejected review round.";
+      image.alt = "R" + roundId + " actual Unity offscreen render: " + review.views[view] + ". " + (round.status === "pending" ? "Independent review pending." : "Rejected under the historical rubric.");
+      byId("badge-" + side).textContent = round.status === "pending" ? "Pending" : "Rejected";
       image.height = view === "gameplay" ? 900 : 1200;
       byId("frame-" + side).classList.toggle("gameplay", view === "gameplay");
       byId("image-link-" + side).href = path;
@@ -366,17 +396,17 @@
       byId("score-" + side).textContent = "R" + roundId;
     });
     const values = selected.map(id => review.rounds[id]);
-    const rows = review.criteria.map((name, index) => ({label: (index + 1) + " · " + name, numbers: values.map(round => round.scores[index]), style: ""}));
-    rows.push({label: "Botanical mean · criteria 1–4", numbers: values.map(round => round.botanical), style: "mean"});
-    rows.push({label: "Art mean · criteria 5–6", numbers: values.map(round => round.art), style: "mean"});
-    rows.push({label: "Overall · lower mean", numbers: values.map(round => round.overall), style: "overall"});
+    const rows = review.criteria.map((name, index) => ({label: (index + 1) + " · " + name, numbers: values.map(round => round.scores ? round.scores[index] : "Pending"), style: ""}));
+    rows.push({label: "Botanical mean · criteria 1–4", numbers: values.map(round => round.botanical ?? "Pending"), style: "mean"});
+    rows.push({label: "Art mean · criteria 5–6", numbers: values.map(round => round.art ?? "Pending"), style: "mean"});
+    rows.push({label: "Overall · lower mean", numbers: values.map(round => round.overall ?? "Pending"), style: "overall"});
     byId("score-body").replaceChildren(...rows.map(row => {
       const tr = document.createElement("tr");
       tr.className = row.style;
       [row.label, ...row.numbers].forEach(value => { const td = document.createElement("td"); td.textContent = String(value); tr.appendChild(td); });
       return tr;
     }));
-    byId("comparison-status").textContent = "R" + selected[0] + " and R" + selected[1] + " are rejected. A later round is not automatically an improvement.";
+    byId("comparison-status").textContent = selected.map(id => "R" + id + ": " + (review.rounds[id].status === "pending" ? "review pending" : "rejected under the historical rubric")).join(". ") + ". R06 remains the approved reference; no automatic promotion.";
   }
   ["round-left", "round-right", "view-select"].forEach(id => byId(id).addEventListener("change", updateReview));
   updateReview();

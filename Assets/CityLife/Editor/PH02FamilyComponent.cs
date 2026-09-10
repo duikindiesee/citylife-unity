@@ -77,7 +77,9 @@ namespace CityLife.World.Editor
 
                 string before = HashCrown(ReadCrown(input));
                 report.buildStage = "fitted support";
-                fit = PH02FittedSupportCandidate.Create(input, Cut, R13Options());
+                var familyOptions=R13Options();
+                familyOptions.flatLowerTangent=true;
+                fit = PH02FittedSupportCandidate.Create(input, Cut, familyOptions);
                 Require(fit.Metrics.numericChecksPassed && fit.Metrics.crownUnchanged &&
                     fit.Metrics.callerCloneUsed && fit.Metrics.callerCrownUnchanged && fit.Metrics.cloneMatchesCaller,
                     "Fitted support numeric or caller-clone preservation checks failed.");

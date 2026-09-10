@@ -6,13 +6,13 @@ Beneath a blue giant and a river of stars, warm desert gives way to luminous sea
 
 [Project home](../README.md) · [Visual milestones](VISUAL-MILESTONES.md) · [Living sea plan](STARFALL-LIVING-SEA.md) · [Asset credits](ASSET-CREDITS.md)
 
-![Actual Unity R16 tree and blue-giant study, still under review](../evidence/milestones/kokerboom/round-16/2026-09-10-08-cosmic-gameplay-eye-level.png)
+![Actual R06 Unity offscreen study associated with the retained preview](../evidence/milestones/kokerboom/round-06/2026-09-10-01-preview-eye-level.png)
 
-*Actual Unity URP output, 10 September 2026 · R16 WIP. This later tree revision is an offscreen scene capture, not concept art or a screenshot of the older R06 executable. It has not passed the visual gate.*
+*Actual R06 Unity offscreen study, 10 September 2026. The running R06 tree is now the user-approved visual reference; this image is its offscreen study, not a newly captured native frame. See the [baseline and freeze](TREE-BASELINE.md).*
 
 ## Current scope
 
-The current standalone preview is an approximately 60 m baked tree and blue-giant study with a simple ground patch, rocks and walk/fly controls. Its tree family is still under review. The wider sculpted terrain, galaxy and living sea are in development; they are not completed features of this player. World shaping, houses, building tools, bots, inhabitants and shared-world connections remain future integrations.
+The preserved R06 standalone preview is an approximately 60 m baked tree and blue-giant study with a simple ground patch, rocks and walk/fly controls. Its tree is the user-approved visual reference; the later R19 offscreen experiment is separately frozen. The wider sculpted terrain, galaxy and living sea remain later direction; they are not completed features of this player or extra work in the tree closeout. World shaping, houses, building tools, bots, inhabitants and shared-world connections remain future integrations.
 
 The preview is intended as a local study and does not generate the earlier island. The preview has no implemented multiplayer, bot connections or saved-world loading. Offline operation and engine telemetry have not been fully validated. The earlier foundation and its instructions remain documented in [LEGACY-ISLAND.md](LEGACY-ISLAND.md).
 
@@ -30,10 +30,10 @@ The [reference record](KOKERBOOM-REFERENCE.md) identifies the user's concept att
 
 | Claim | Status | Evidence | Remaining gap |
 |---|---|---|---|
-| Latest full tree family | **R16 rejected, 5.75/10 overall**; botanical 6.75, art 5.75 | [Independent critique](KOKERBOOM-CRITIQUE.md#round-16-ph02-fitted-crown-family-rejected), [21-view manifest](../evidence/milestones/kokerboom/round-16/metrics.json) | Both visual means must reach 9.0 with no major defect |
-| Changed PH02 family | **Numeric FAIL at assertion 522:** full-age root extends below the unchanged −1 m floor | [Exact failure report](../evidence/verified/kokerboom-round-16-ph02-validation-failed.json) | Repair root geometry and rerun; ten closed wood samples do not turn the failed run into a pass |
+| Visual reference and closeout | **R06 user approved**; tree iteration frozen after R19 review | [Tree baseline](TREE-BASELINE.md) | R19 remains a separate experiment; defects deferred; no 9/10 world-work prerequisite |
+| Revised experimental source | **R18 PASS, 536 assertions** | [R18 numeric report](../evidence/verified/kokerboom-round-18-family-validation.json), [historical R16 failure](../evidence/verified/kokerboom-round-16-ph02-validation-failed.json) | R19 full review recorded at 7.375/10; frozen; numeric checks do not establish visual or native-player acceptance |
 | Separate Windows study | R06 build succeeded and local WIP was launched | [R06 build record](../evidence/milestones/kokerboom/round-06/preview-build.json) | Full native control, collision and performance acceptance |
-| Wider world and living sea | Planned / unimplemented | [Living sea design and future acceptance route](STARFALL-LIVING-SEA.md) | Implementation after the tree gate and actual scene/input evidence |
+| Wider world and living sea | Planned / unimplemented | [Living sea design and future acceptance route](STARFALL-LIVING-SEA.md) | Later direction outside this tree closeout; implementation and actual scene/input evidence remain future work |
 
 The main R16 tree contains **6,591,379 triangles** and its cold editor creation took **517,901 ms** ([sanitized authoring record](../evidence/verified/kokerboom-round-16-authoring-cost.json)). This measures authoring cost, not FPS; stage attribution and sustained runtime suitability remain separate.
 
@@ -58,6 +58,6 @@ The repository retains its history and review. Internal `CityLife.World` namespa
 - Next-build Windows product: `Kooker Starfall`; executable: `Builds/KookerStarfall-<UTC>/KookerStarfall.exe`. The filesystem-safe product name omits the display colon.
 - Internal class names, generated scene paths, command-line options, input logs and screenshot filename prefixes remain unchanged.
 - The already-built [R06 preview](../evidence/milestones/kokerboom/round-06/preview-build.json) retains its earlier `Cosmic World Preview` product and `CosmicWorldPreview.exe`. Branding work did not restart, rebuild or alter that running player. The [checked R06 ZIP](../evidence/verified/starfall-r06-package-check.json) packages its 183 runtime files unchanged with three documentation files; it does not contain a newly built R16 family.
-- R06 and all earlier inspection captures retain their original filenames and labels. The latest full-family [R16 PH02 inspection](../evidence/milestones/kokerboom/round-16/metrics.json) remains visually rejected; its images show the source state at capture, not a newly branded runtime.
+- R06 and all earlier inspection captures retain their original filenames and labels. The historical R16 PH02 inspection remains rejected under the critic rubric. [R19](VISUAL-MILESTONES.md#round-19-frozen-family-review) preserves 21 final experimental offscreen images, independently scored 7.375/10 and frozen with defects deferred; neither is a newly branded runtime or an automatic replacement for R06.
 
 The previous README is retained in full below its historical notice in [LEGACY-ISLAND.md](LEGACY-ISLAND.md), with relative links adjusted for its new directory. Its island size, functionality and verification claims remain historical; they do not describe the small Starfall study.

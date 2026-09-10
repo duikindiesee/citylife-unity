@@ -374,3 +374,74 @@ The later `batchmode/nographics` [numeric attempt](../evidence/verified/kokerboo
 At the user's request, the already-built R06 player was packaged as `Kooker-Starfall-WIP-R06-Windows.zip`: **169,258,413 bytes (161.42 MiB), 186 checked entries and all 183 original runtime files unchanged**. The [sanitized package check](../evidence/verified/starfall-r06-package-check.json) records SHA256 `f24e31dc973ef8eb3addf8a9b457e142b736ad03ba4845841fd9dfe12c471bf9`, exact per-entry hashes and path checks. Three documentation files were added; packaging did not rebuild, restart, control or upload the player. Its product/executable remain `Cosmic World Preview` / `CosmicWorldPreview.exe`.
 
 **R16 images show the later source inspection, not the packaged R06 executable.** The package does not include a newly verified R16 player or prove other-device operation, full native controls, collision, sustained performance or offline/telemetry acceptance. Earlier captures and the frozen through-R14 progress video remain unchanged.
+
+
+## Scoped tree pilots — R17 and R18 · 2026-09-10
+
+R17 and R18 are **six-view pilots, without full-family scores**. Both use tint 1 and the shared tree-skin treatment. R18 further changes the lower support/foliage treatment and base geometry. Their render success does not establish visual acceptance. The [user-directed baseline](TREE-BASELINE.md) keeps R06 as the approved visual reference and closes tree iteration with the completed R19 review; remaining defects are deferred.
+
+### R17 scoped captures
+
+The [manifest](../evidence/milestones/kokerboom/round-17/metrics.json) records `2026-09-10T21:22:28.5208485Z`, **six actual Unity captures**, technical checks passed, **zero errors and one warning**. The [camera-field comparison](../evidence/milestones/kokerboom/round-17/ph02-shot-camera-comparison.json) uses R16 as reference. Only shot 18 has exactly equal recorded camera fields; 05/08/13/20/21 differ. Image dimensions and projection modes match, but raw Euler/position/framing differences remain explicit. These are the same view categories, not a replay or a camera-matrix equivalence claim.
+
+| ID | Preserved actual Unity image |
+|---|---|
+| 05 | [Trunk bark closeup](../evidence/milestones/kokerboom/round-17/2026-09-10-05-trunk-bark-closeup.png) |
+| 08 | [Cosmic gameplay eye level](../evidence/milestones/kokerboom/round-17/2026-09-10-08-cosmic-gameplay-eye-level.png) |
+| 13 | [Juvenile closeup](../evidence/milestones/kokerboom/round-17/2026-09-10-13-juvenile-closeup.png) |
+| 18 | [Ph02 lower crown wood join side](../evidence/milestones/kokerboom/round-17/2026-09-10-18-ph02-lower-crown-wood-join-side.png) |
+| 20 | [Ph02 juvenile base](../evidence/milestones/kokerboom/round-17/2026-09-10-20-ph02-juvenile-base.png) |
+| 21 | [Ph02 mature base second angle](../evidence/milestones/kokerboom/round-17/2026-09-10-21-ph02-mature-base-second-angle.png) |
+### R18 scoped captures
+
+The [manifest](../evidence/milestones/kokerboom/round-18/metrics.json) records `2026-09-10T21:29:11.0180924Z`, **six actual Unity captures**, technical checks passed, **zero errors and one warning**. The [camera-field comparison](../evidence/milestones/kokerboom/round-18/ph02-shot-camera-comparison.json) uses R16 as reference. All six have differing recorded camera fields. Image dimensions and projection modes match, but raw Euler/position/framing differences remain explicit. These are the same view categories, not a replay or a camera-matrix equivalence claim.
+
+| ID | Preserved actual Unity image |
+|---|---|
+| 05 | [Trunk bark closeup](../evidence/milestones/kokerboom/round-18/2026-09-10-05-trunk-bark-closeup.png) |
+| 08 | [Cosmic gameplay eye level](../evidence/milestones/kokerboom/round-18/2026-09-10-08-cosmic-gameplay-eye-level.png) |
+| 13 | [Juvenile closeup](../evidence/milestones/kokerboom/round-18/2026-09-10-13-juvenile-closeup.png) |
+| 18 | [Ph02 lower crown wood join side](../evidence/milestones/kokerboom/round-18/2026-09-10-18-ph02-lower-crown-wood-join-side.png) |
+| 20 | [Ph02 juvenile base](../evidence/milestones/kokerboom/round-18/2026-09-10-20-ph02-juvenile-base.png) |
+| 21 | [Ph02 mature base second angle](../evidence/milestones/kokerboom/round-18/2026-09-10-21-ph02-mature-base-second-angle.png) |
+
+### R18 numerical check, separate from visual acceptance
+
+The [fresh R18 experimental-source report](../evidence/verified/kokerboom-round-18-family-validation.json) records **PASS: 536 assertions** at `2026-09-10T21:34:40.7412516Z`. Ten fully recorded specimens and ten wood topology inspections, independent regeneration, eleven unchanged source inputs, actual PH02 component readback and PH02 cleanup pass. The full-age recorded minimum Y is approximately **−0.860049 m**, within the unchanged −1 m floor; the older R16 failure remains preserved. Report SHA256: `0169a3187f420f8f4166d88806c38ef1bf6bbbcf09f4e3bd32222c57ac5435c1`.
+
+This is numerical evidence for its recorded source, not a critic score, native-player test, FPS measurement or approval to replace R06. The completed full R19 offscreen review is the closing experiment; no further micro-pilot or corrective round is planned.
+
+
+## Round 19 frozen family review
+
+**Final independent result: 7.375/10 (7.4 at one decimal), rejected under the historical 9/10 rubric.** All 21 images were reviewed. Botanical mean **7.375**; art mean **7.5**. This frozen experimental candidate does not replace the user-approved R06 visual reference. Remaining defects are **deferred**; tree polishing is closed by user direction.
+
+The [full capture manifest](../evidence/milestones/kokerboom/round-19/metrics.json) records `2026-09-10T21:38:24.4067079Z`, **21 actual Unity offscreen images**, technical capture checks passed, **zero errors and one warning**. This is the full PH02-family mode with foliage tint 1, not either six-view pilot. The [freeze record](../evidence/verified/starfall-tree-baseline.json) rechecks the nine frozen source files and ties this candidate to the separate [R18 numeric PASS, 536 assertions](../evidence/verified/kokerboom-round-18-family-validation.json). Numerical success does not award visual scores or validate a new player.
+
+See the [primary tree baseline](TREE-BASELINE.md) and [independent critique record](KOKERBOOM-CRITIQUE.md#round-19-frozen-family-review). The R06 package and earlier images/video remain unchanged.
+
+| ID | Preserved actual Unity image |
+|---|---|
+| 01 | [Neutral front](../evidence/milestones/kokerboom/round-19/2026-09-10-01-neutral-front.png) |
+| 02 | [Neutral three quarter](../evidence/milestones/kokerboom/round-19/2026-09-10-02-neutral-three-quarter.png) |
+| 03 | [Neutral rear](../evidence/milestones/kokerboom/round-19/2026-09-10-03-neutral-rear.png) |
+| 04 | [Branch union closeup](../evidence/milestones/kokerboom/round-19/2026-09-10-04-branch-union-closeup.png) |
+| 05 | [Trunk bark closeup](../evidence/milestones/kokerboom/round-19/2026-09-10-05-trunk-bark-closeup.png) |
+| 06 | [Terminal rosette closeup](../evidence/milestones/kokerboom/round-19/2026-09-10-06-terminal-rosette-closeup.png) |
+| 07 | [Age lineup metres](../evidence/milestones/kokerboom/round-19/2026-09-10-07-age-lineup-metres.png) |
+| 08 | [Cosmic gameplay eye level](../evidence/milestones/kokerboom/round-19/2026-09-10-08-cosmic-gameplay-eye-level.png) |
+| 09 | [Cosmic gameplay overlook](../evidence/milestones/kokerboom/round-19/2026-09-10-09-cosmic-gameplay-overlook.png) |
+| 10 | [Neutral front no shadows](../evidence/milestones/kokerboom/round-19/2026-09-10-10-neutral-front-no-shadows.png) |
+| 11 | [Isolated rosette above](../evidence/milestones/kokerboom/round-19/2026-09-10-11-isolated-rosette-above.png) |
+| 12 | [Isolated rosette side](../evidence/milestones/kokerboom/round-19/2026-09-10-12-isolated-rosette-side.png) |
+| 13 | [Juvenile closeup](../evidence/milestones/kokerboom/round-19/2026-09-10-13-juvenile-closeup.png) |
+| 14 | [Adult seed variation](../evidence/milestones/kokerboom/round-19/2026-09-10-14-adult-seed-variation.png) |
+| 15 | [Untextured branch union closeup](../evidence/milestones/kokerboom/round-19/2026-09-10-15-untextured-branch-union-closeup.png) |
+| 16 | [Cosmic leaf albedo only](../evidence/milestones/kokerboom/round-19/2026-09-10-16-cosmic-leaf-albedo-only.png) |
+| 17 | [Cosmic strong cool fill](../evidence/milestones/kokerboom/round-19/2026-09-10-17-cosmic-strong-cool-fill.png) |
+| 18 | [Ph02 lower crown wood join side](../evidence/milestones/kokerboom/round-19/2026-09-10-18-ph02-lower-crown-wood-join-side.png) |
+| 19 | [Ph02 lower crown wood join underside](../evidence/milestones/kokerboom/round-19/2026-09-10-19-ph02-lower-crown-wood-join-underside.png) |
+| 20 | [Ph02 juvenile base](../evidence/milestones/kokerboom/round-19/2026-09-10-20-ph02-juvenile-base.png) |
+| 21 | [Ph02 mature base second angle](../evidence/milestones/kokerboom/round-19/2026-09-10-21-ph02-mature-base-second-angle.png) |
+
+R19's main tree contains **3,745,751 vertices and 6,550,207 triangles**, with 61 crowns, 913 branch segments and six generations in its recorded descriptor. These are offscreen authoring counts, not FPS or runtime acceptance. The critic recorded gains in continuous blue-green foliage, shared skin and juvenile contact; angular bends, a small junction rim, repeated bark/rosettes, cyan uniformity and distance readability remain deferred. [Exact final scores](KOKERBOOM-CRITIQUE.md#round-19-frozen-family-review) do not promote the experiment over R06.

@@ -201,7 +201,9 @@ namespace CityLife.World
             Vector3 lean=new Vector3(Range(r,-.10f,.10f),0,Range(r,-.10f,.10f))*h;
             Vector3 fork=new Vector3(lean.x*.25f,trunkTop,lean.z*.25f);
             // Basal flare and subtle trunk curvature are part of the same connected volume.
-            Vector3 previous=new Vector3(0,-.30f*radius-.08f,0); float previousRadius=radius*(generations==0?1.08f:1.10f);
+            // Keep the basal endpoint sphere shallow enough for a planted root,
+            // rather than burying a full trunk radius more than one metre deep.
+            Vector3 previous=new Vector3(0,-.18f*radius-.06f,0); float previousRadius=radius*(generations==0?1.08f:1.02f);
             for(int s=1;s<=12;s++)
             {
                 float t=s/12f;
@@ -220,14 +222,21 @@ namespace CityLife.World
                 {
                     float a=k*Mathf.PI*2/5+Range(r,-.23f,.23f);
                     Vector3 edge=new Vector3(Mathf.Cos(a),0,Mathf.Sin(a))*radius*Range(r,1.18f,1.56f);
-                    f.limbs.Add(new Limb{a=new Vector3(0,-.05f*radius,0),b=edge+Vector3.down*radius*.32f,ra=radius*.34f,rb=radius*.17f,path=rootPath});
+                    // A low buttress rises just outside the trunk, then tapers
+                    // below soil. The old entire root ended below grade before
+                    // emerging from the trunk, leaving a circular cut-off base.
+                    Vector3 shoulder=edge*.68f+Vector3.up*radius*.045f;
+                    f.limbs.Add(new Limb{a=new Vector3(0,-.05f*radius,0),b=shoulder,ra=radius*.34f,rb=radius*.18f,path=rootPath});
+                    f.limbs.Add(new Limb{a=shoulder,b=edge+Vector3.down*radius*.065f,ra=radius*.18f,rb=radius*.03f,path=rootPath});
                 }
             }
             // A broad, domed crown grows from curved primary forks. The target
             // envelope and its local branch clusters share the same seeded variation.
             float spread=h*Mathf.Lerp(.17f,.39f,age)*Range(r,.88f,1.17f);
             if(generations==0)
-                f.rosettes.Add(new Rosette{p=fittedCrownInspection?Vector3.down*.02f:fork,axis=Vector3.up,size=.98f+age,turn=Range(r,0,6.28f)});
+                // Plant the native-scale young crown closer to the soil. Its
+                // lower support is underground; the leaf geometry is not resized.
+                f.rosettes.Add(new Rosette{p=fittedCrownInspection?Vector3.down*.38f:fork,axis=Vector3.up,size=.98f+age,turn=Range(r,0,6.28f)});
             else
             {
                 var tips=new List<Vector3>();
@@ -298,9 +307,12 @@ namespace CityLife.World
                     startRadius=Mathf.Max(startRadius,endRadius*1.045f);
                 }
                 Vector3 prev=from;float prevRadius=startRadius;int path=f.nextPath++;
-                for(int j=1;j<=7;j++)
+                // Sample long curved limbs more finely so the implicit surface
+                // does not inherit seven visibly straight sections at every scale.
+                int curveSegments=Mathf.Clamp(Mathf.CeilToInt(branchLength/.13f),7,28);
+                for(int j=1;j<=curveSegments;j++)
                 {
-                    float t=j/7f,u=1-t; Vector3 p=u*u*u*from+3*u*u*t*control0+3*u*t*t*control1+t*t*t*end;
+                    float t=j/(float)curveSegments,u=1-t; Vector3 p=u*u*u*from+3*u*u*t*control0+3*u*t*t*control1+t*t*t*end;
                     float rad=Mathf.Lerp(startRadius,endRadius,t);
                     f.limbs.Add(new Limb{a=prev,b=p,ra=prevRadius,rb=rad,path=path}); prev=p;prevRadius=rad;
                 }
@@ -308,10 +320,12 @@ namespace CityLife.World
                 {
                     Vector3 outward=new Vector3(end.x,0,end.z).normalized;
                     Vector3 axis=(Vector3.up+outward*Range(r,.08f,.36f)+tangent1*.10f).normalized;
-                    // Sink the wood end into the original leaf-root junction; avoid an
-                    // exposed flat stump between the terminal shoot and the leaf bases.
+                    // The fitted support starts at the terminal endpoint. Its flat
+                    // lower radial tangent contains the wood cap; sinking it eight
+                    // centimetres into the narrowing shaft made two visible rings.
+                    // PH01 retains its earlier short leaf-root overlap.
                     if(fittedCrownInspection)axis=tangent1;
-                    f.rosettes.Add(new Rosette{p=end-axis*(fittedCrownInspection?.08f:.018f),axis=axis,size=crownScale,turn=Range(r,0,6.2832f)});
+                    f.rosettes.Add(new Rosette{p=fittedCrownInspection?end:end-axis*.018f,axis=axis,size=crownScale,turn=Range(r,0,6.2832f)});
                 }
                 else CrownBranches(f,r,end,tangent1,endRadius,group,level+1,generations,azimuth+1.5708f+Range(r,-.62f,.62f),trunkHeight);
             }

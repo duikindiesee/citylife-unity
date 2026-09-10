@@ -89,7 +89,7 @@ Frame validity checks must reject empty/near-uniform captures and rendering exce
 
 ## Implementation order and evidence boundary
 
-After the tree gate passes, prepare the new versioned coastal slice and collision first, then waterline/swimming, then anchored growth and moving populations, and finally the complete sky/land/sea composition and performance pass. Keep each stage independently inspectable. No current code, scene, build, world definition, save or running game was changed to prepare this document.
+The user-directed [R06 tree baseline and freeze](TREE-BASELINE.md) replaces the previous tree-score prerequisite. The following is later world direction, not further work in this closeout: prepare a new versioned coastal slice and collision, then waterline/swimming, anchored growth and moving populations, and the complete sky/land/sea composition and performance pass. Keep each stage independently inspectable. No current code, scene, build, world definition, save or running game was changed to prepare this document.
 
 | Claim | Status | Evidence | Remaining gap |
 |---|---|---|---|
