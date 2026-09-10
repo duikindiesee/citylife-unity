@@ -25,3 +25,7 @@ tools/.reference-cache/
 *.pem
 *.key
 *.ulf
+Assets/CityLife/GeneratedPreview-*/
+Assets/CityLife/GeneratedPreview-*.meta
+__pycache__/
+*.py[cod]

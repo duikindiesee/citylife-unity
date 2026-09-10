@@ -8,9 +8,11 @@ Authenticated read-only discovery confirmed that [kooker-workflows](https://gith
 
 The browser's [secret-scan workflow](https://github.com/duikindiesee/citylife/blob/b71307023aea600da27aa3eada6cdcce7ba758ed/.github/workflows/secret-scan.yml) supplies the applicable security pattern: pinned open-source Gitleaks CLI, verified release checksum, full reachable history, fully redacted logs, no findings artifact, and read-only Actions permissions. Its hardware WebGL runner is a separate browser lane; it is not assumed to be a licensed Unity runner.
 
-## Checks on every pull request
+## Checks for main and explicit dispatch
 
 `CI` runs on GitHub-hosted Ubuntu 24.04 for pull requests to `main`, pushes to `main`, and explicit dispatch. It does not use a private runner, repository credentials or a Unity licence.
+
+The Starfall WIP is stacked on `codex/island-foundation`, so its pull request does **not** automatically trigger either workflow. For each published Starfall commit, dispatch both `ci.yml` and `secret-scan.yml` with `--ref codex/kokerboom-cosmic-desert`, then verify every run's `head_sha` equals that published commit and all jobs succeed. Repeat after every later push; previous foundation or Starfall results do not cover a new head. Expanding automatic pull-request coverage to all base branches remains an explicit automation improvement. Existing action pins, jobs, schedules and read-only permissions are retained.
 
 | Check | What it establishes | What it does not establish |
 | --- | --- | --- |
