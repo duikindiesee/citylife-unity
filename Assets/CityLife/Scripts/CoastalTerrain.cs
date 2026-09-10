@@ -1,0 +1,154 @@
+using System;
+using UnityEngine;
+using UnityEngine.Rendering;
+
+namespace CityLife.World
+{
+    /// <summary>A finite, new coastal study. Never reads or changes an IslandDefinition or saved edits.</summary>
+    public static class CoastalTerrain
+    {
+        public const string DefinitionId = "starfall.coastal-slice.v1";
+        public const int Seed = 1904242;
+        public const float MinX = -90f, MaxX = 90f, MinZ = -55f, MaxZ = 145f;
+        public const float SeaLevel = CoastalWater.Level;
+        public const int CellsX = 240, CellsZ = 268;
+        public const float HeroPadRadius = 8.5f;
+
+        private static readonly Vector2[] Feed = Curve(new[] {
+            new Vector2(-8,-65), new Vector2(-8,-48), new Vector2(-4,-33), new Vector2(0,-22)
+        });
+        private static readonly Vector2[] Outlet = Curve(new[] {
+            new Vector2(0,22), new Vector2(-8,39), new Vector2(-3,56), new Vector2(8,76), new Vector2(10,96)
+        });
+
+        /// <summary>Metre-space surface height; outside this finite patch, returns the nearest edge height.</summary>
+        public static float Height(float x, float z)
+        {
+            if (float.IsNaN(x) || float.IsInfinity(x) || float.IsNaN(z) || float.IsInfinity(z))
+                throw new ArgumentOutOfRangeException("Coastal coordinates must be finite.");
+            x = Mathf.Clamp(x, MinX, MaxX); z = Mathf.Clamp(z, MinZ, MaxZ);
+            float broad = Noise(x * .027f, z * .027f);
+            float ground = .8f + broad * 1.7f + Noise(x * .079f + 17, z * .079f) * .32f;
+
+            // Distinct asymmetric mesa masses frame the channel; their shoulders are
+            // several metres deep, rather than noise displacing an otherwise flat plane.
+            float mesa = Mesa(x,z,-49,28,23,38,25,7);
+            mesa = Mathf.Max(mesa,Mesa(x,z,-69,-18,19,29,18,31));
+            mesa = Mathf.Max(mesa,Mesa(x,z,49,32,22,38,27,63));
+            mesa = Mathf.Max(mesa,Mesa(x,z,73,64,18,27,20,97));
+            mesa = Mathf.Max(mesa,Mesa(x,z,-70,70,18,25,24,151));
+            ground += mesa;
+
+            // Near-ring meander: a west-facing land neck keeps this an outcrop connected
+            // to the bank, rather than claiming a recreation of the old island outline.
+            float radius = Mathf.Sqrt(x * x + z * z);
+            float ringRadius = Mathf.Sqrt(x * x + z * z * .88f);
+            float ringOffset = 21f + Noise(x * .085f + 13, z * .085f) * .75f;
+            float ringDistance = Mathf.Abs(ringRadius - ringOffset) - 5.6f;
+            float westNeck = Smooth(.78f, .98f, -x / Mathf.Max(radius, .001f)) * (1f - Smooth(3f, 7f, Mathf.Abs(z)));
+            float ringCut = (1f - Smooth(-.6f, 4.2f, ringDistance)) * (1f - westNeck);
+            float feedWidth = Mathf.Lerp(6.8f, 5.4f, Smooth(-55f, -22f, z));
+            float feedCut = 1f - Smooth(-.5f, 4.5f, DistanceToCurve(x,z,Feed) - feedWidth);
+            float outletWidth = Mathf.Lerp(5.4f, 19f, Smooth(30f, 79f, z));
+            float outletCut = 1f - Smooth(-.7f, 5f, DistanceToCurve(x,z,Outlet) - outletWidth);
+            float channelCut = Mathf.Max(ringCut, Mathf.Max(feedCut, outletCut));
+            float riverBed = -4.5f + Noise(x * .075f + 9, z * .075f) * .4f;
+            riverBed -= Smooth(38f, 86f, z) * 6.5f;
+            ground = Mathf.Lerp(ground, Mathf.Min(ground, riverBed), channelCut);
+
+            // One continuous underwater heightfield extends into the broad genuine sea.
+            float coast = 66f + Mathf.Sin(x * .041f) * 6f + Noise(x * .032f, 31) * 4f;
+            float seaCut = Smooth(coast - 12f, coast + 14f, z);
+            float seabed = Mathf.Lerp(-10f, -17.2f, Smooth(66f, 145f, z)) + Noise(x * .035f + 5,z * .035f) * .65f;
+            ground = Mathf.Lerp(ground, seabed, seaCut);
+
+            // Exact, broad 0 m pad protects the frozen hero tree's existing root placement.
+            // The shoulder transitions to the carved shore between 8.5 and 13 metres.
+            float pad = 1f - Smooth(HeroPadRadius, 13f, radius);
+            ground = Mathf.Lerp(ground, 0f, pad);
+            return ground;
+        }
+
+        public static GameObject Create(Transform parent)
+        {
+            Shader shader = Shader.Find("CityLife/CoastalTerrain");
+            if (shader == null || !shader.isSupported) throw new InvalidOperationException("Required CoastalTerrain shader is unavailable.");
+            int stride = CellsX + 1;
+            var vertices = new Vector3[stride * (CellsZ + 1)];
+            var uv = new Vector2[vertices.Length];
+            var indices = new int[CellsX * CellsZ * 6];
+            int cursor = 0;
+            for (int z = 0; z <= CellsZ; z++) for (int x = 0; x <= CellsX; x++)
+            {
+                float wx = Mathf.Lerp(MinX,MaxX,x/(float)CellsX), wz = Mathf.Lerp(MinZ,MaxZ,z/(float)CellsZ);
+                int at = z * stride + x;
+                vertices[at] = new Vector3(wx,Height(wx,wz),wz); uv[at] = new Vector2(wx,wz) * .25f;
+                if (x == CellsX || z == CellsZ) continue;
+                indices[cursor++] = at; indices[cursor++] = at + stride; indices[cursor++] = at + 1;
+                indices[cursor++] = at + 1; indices[cursor++] = at + stride; indices[cursor++] = at + stride + 1;
+            }
+            var mesh = new Mesh { name = DefinitionId + " seed " + Seed + " continuous land and seabed", indexFormat = IndexFormat.UInt32 };
+            mesh.vertices = vertices; mesh.uv = uv; mesh.triangles = indices;
+            mesh.RecalculateNormals(); mesh.RecalculateBounds();
+            var material = new Material(shader) { name = "Coastal ochre strata and sandy shelves - procedural" };
+            material.SetFloat("_SeaLevel",SeaLevel);
+            var root = new GameObject("Coastal terrain " + DefinitionId + " seed " + Seed);
+            root.transform.SetParent(parent,false);
+            root.layer = 8;
+            root.AddComponent<MeshFilter>().sharedMesh = mesh;
+            root.AddComponent<MeshRenderer>().sharedMaterial = material;
+            // The identical mesh is the static collision surface. No hidden flat proxy.
+            root.AddComponent<MeshCollider>().sharedMesh = mesh;
+            return root;
+        }
+
+        private static float Mesa(float x,float z,float cx,float cz,float rx,float rz,float height,float salt)
+        {
+            float warpX = Noise(x*.041f+salt,z*.041f)*2.5f;
+            float warpZ = Noise(x*.039f,z*.039f+salt)*2.2f;
+            float dx=(x-cx+warpX)/rx,dz=(z-cz+warpZ)/rz;
+            float shoulder = 1f - Mathf.Sqrt(dx*dx+dz*dz);
+            float rise = Smooth(-.16f,.22f,shoulder);
+            float terraces = rise*.80f + Smooth(.21f,.34f,rise)*.07f + Smooth(.48f,.60f,rise)*.08f + Smooth(.76f,.89f,rise)*.05f;
+            return terraces * (height + Noise(x*.085f+salt,z*.085f)*1.4f);
+        }
+
+        private static float Smooth(float low,float high,float value)
+        {
+            float t=Mathf.Clamp01((value-low)/(high-low)); return t*t*(3f-2f*t);
+        }
+        private static float Noise(float x,float z)
+        {
+            int ix=Mathf.FloorToInt(x),iz=Mathf.FloorToInt(z);
+            float tx=x-ix,tz=z-iz;tx=tx*tx*(3-2*tx);tz=tz*tz*(3-2*tz);
+            return Mathf.Lerp(Mathf.Lerp(Hash(ix,iz),Hash(ix+1,iz),tx),Mathf.Lerp(Hash(ix,iz+1),Hash(ix+1,iz+1),tx),tz);
+        }
+        private static float Hash(int x,int z)
+        {
+            unchecked { uint h=(uint)x*374761393u+(uint)z*668265263u+(uint)Seed;h=(h^(h>>13))*1274126177u;h^=h>>16;return (h&0xffffffu)/8388607.5f-1f; }
+        }
+        private static Vector2[] Curve(Vector2[] knots)
+        {
+            const int subdivisions=8;
+            var points=new Vector2[(knots.Length-1)*subdivisions+1];int at=0;
+            for(int i=0;i<knots.Length-1;i++) for(int j=0;j<subdivisions;j++)
+            {
+                float t=j/(float)subdivisions,t2=t*t,t3=t2*t;
+                Vector2 a=knots[Mathf.Max(0,i-1)],b=knots[i],c=knots[i+1],d=knots[Mathf.Min(knots.Length-1,i+2)];
+                points[at++]=.5f*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t2+(-a+3*b-3*c+d)*t3);
+            }
+            points[at]=knots[knots.Length-1];return points;
+        }
+        private static float DistanceToCurve(float x,float z,Vector2[] points)
+        {
+            var p=new Vector2(x,z);float best=float.MaxValue;
+            for(int i=0;i<points.Length-1;i++)
+            {
+                Vector2 a=points[i],delta=points[i+1]-a;
+                float t=Mathf.Clamp01(Vector2.Dot(p-a,delta)/Mathf.Max(delta.sqrMagnitude,.000001f));
+                best=Mathf.Min(best,(p-a-delta*t).sqrMagnitude);
+            }
+            return Mathf.Sqrt(best);
+        }
+    }
+}
