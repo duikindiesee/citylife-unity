@@ -44,15 +44,15 @@ R16's historical full review remains **5.75/10, rejected under that rubric**; it
 
 Use **Unity 6000.6.0f1** with Windows build support. URP **17.6.0** and Input System **1.20.0** are pinned in [Packages/manifest.json](Packages/manifest.json).
 
-The approved reference package remains R06. The command below creates a new, separately unreviewed source build; it does not reproduce or promote the approved reference automatically. From the repository root:
+The R06 reference is preserved. The separate **0.0.2-preview.1 R19 player** has now been built, packaged and observed in its native window. See the [release notes, version mapping and checksums](docs/RELEASE-0.0.2-preview.1.md). To create another distinct R19 build from committed source:
 
 ~~~powershell
-.\tools\render-kokerboom.ps1 -Round round-100 -PlayablePreview
+.\tools\render-kokerboom.ps1 -Round round-100 -R19PlayablePreview
 ~~~
 
-Choose an unused round number; the label only identifies evidence and does not affect world generation. The script renders two study views and bakes a Windows player into `Builds/KookerStarfall-<UTC>/`. It preserves earlier captures, refuses to run alongside another Unity editor and does not launch the player. Open `KookerStarfall.exe` from the resulting folder; keep the data folder and DLLs beside it.
+Choose an unused round number; the label only identifies evidence and does not affect world generation. The script renders two study views and bakes a Windows player into `Builds/KookerStarfallR19-0.0.2-preview.1-<UTC>/`. It preserves earlier captures, refuses to run alongside another Unity editor and does not launch the player. Open `KookerStarfallR19.exe` from the resulting folder; keep the data folder and DLLs beside it.
 
-**The Starfall branding is source-only until this new build is verified.** The retained [R06 build record](evidence/milestones/kokerboom/round-06/preview-build.json) refers to the earlier `CosmicWorldPreview.exe`, which has already been used as a local WIP preview. The later R16/R19 images are not screenshots of that executable. The current `-PlayablePreview` command selects a later PH01 hybrid, not the PH02 R19 inspection family, and cannot reproduce exact R06 bytes. The [checked R06 package](evidence/verified/starfall-r06-package-check.json), `Kooker-Starfall-WIP-R06-Windows.zip` (161.42 MiB), preserves all 183 runtime files unchanged; packaging did not rebuild the player.
+The new player uses the frozen R19 PH02 family and explicit tint1. Its automatic player checks cover actual rendering, walking, ground clearance, flight, stage bounds and trunk collision. Native startup and the versioned HUD were observed after an authorized launch; the user explored without agent movement input. Full native controls, sustained performance and other-device execution remain unverified. R06 remains unchanged and separately available. The legacy `-PlayablePreview` route selects a different PH01 hybrid; it does not reproduce R06 or this R19 release.
 
 | Control | Action |
 |---|---|
@@ -72,10 +72,10 @@ The preview has no implemented multiplayer, bot connections or saved-world loadi
 
 | Claim | Status | Evidence | Remaining gap |
 |---|---|---|---|
-| Separate Windows study | R06 build succeeded; local WIP used | [Build record](evidence/milestones/kokerboom/round-06/preview-build.json) | Full native controls, collision and measured performance acceptance |
+| Separate Windows study | R19 0.0.2-preview.1 built and packaged; native window observed | [Release record](evidence/verified/starfall-r19-release.json) | Native controls, rock collision and sustained performance |
 | Visual reference and tree closeout | **R06 user approved**; frozen after the completed R19 review | [Baseline record](docs/TREE-BASELINE.md) | Experimental R19 is separate; remaining defects deferred, no further 9/10 polishing gate |
-| Revised experimental PH02 source | **R18 numeric PASS, 536 assertions** | [Exact report](evidence/verified/kokerboom-round-18-family-validation.json) | All 21 R19 captures complete; independent result 7.375/10, frozen; R16 failure preserved; no new native player |
-| Starfall branding | Repository renamed; source updated | [Naming and continuity record](docs/STARFALL.md) | Branded build and runtime verification |
+| Revised experimental PH02 source | **R18 numeric PASS, 536 assertions** | [Exact report](evidence/verified/kokerboom-round-18-family-validation.json) | All 21 R19 captures complete; independent result 7.375/10, frozen; R16 failure preserved; separate R19 player now recorded below |
+| Starfall branding | Versioned R19 title and HUD observed | [Native window](evidence/milestones/starfall-r19-player/2026-09-10-native-r19-window.png) | None for naming |
 | Wider world and living sea | Planned | [World direction](docs/STARFALL.md), [sea plan](docs/STARFALL-LIVING-SEA.md) | Implementation and actual scene evidence |
 
 ## 🧭 Project guide

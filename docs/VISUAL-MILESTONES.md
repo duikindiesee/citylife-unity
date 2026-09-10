@@ -445,3 +445,12 @@ See the [primary tree baseline](TREE-BASELINE.md) and [independent critique reco
 | 21 | [Ph02 mature base second angle](../evidence/milestones/kokerboom/round-19/2026-09-10-21-ph02-mature-base-second-angle.png) |
 
 R19's main tree contains **3,745,751 vertices and 6,550,207 triangles**, with 61 crowns, 913 branch segments and six generations in its recorded descriptor. These are offscreen authoring counts, not FPS or runtime acceptance. The critic recorded gains in continuous blue-green foliage, shared skin and juvenile contact; angular bends, a small junction rim, repeated bark/rosettes, cyan uniformity and distance readability remain deferred. [Exact final scores](KOKERBOOM-CRITIQUE.md#round-19-frozen-family-review) do not promote the experiment over R06.
+
+
+## R19 player integration — 0.0.2-preview.1
+
+This is a separate player release, not another tree critique. [Release notes and checksums](RELEASE-0.0.2-preview.1.md) record frozen R19 geometry, actual executable checks, R06 preservation and native limitations.
+
+![Actual new R19 native window and versioned HUD](../evidence/milestones/starfall-r19-player/2026-09-10-native-r19-window.png)
+
+Observed after the user authorized visible launch. No agent movement input was sent. Automatic shared-controller checks are separately recorded in the [player report](../evidence/milestones/starfall-r19-player/preview-smoke-20260910-223430-378.json). [Two prebuild views](../evidence/milestones/kokerboom/round-20/metrics.json) are integration evidence, not a new scored round.
