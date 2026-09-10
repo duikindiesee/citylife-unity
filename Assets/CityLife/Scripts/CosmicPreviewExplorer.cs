@@ -29,6 +29,7 @@ namespace CityLife.World
         private const float Skin = .025f;
         private bool ready, flying, looking, previousFast, previousLooking, previousFlying;
         private Vector3 previousInput;
+        private Collider lastSweepCollider;
         private float yaw, pitch, messageUntil;
         private string message = "", evidenceDirectory;
         private GUIStyle titleStyle, bodyStyle, statusStyle;
@@ -52,7 +53,7 @@ namespace CityLife.World
 
         private void Update()
         {
-            if (!ready) return;
+            if (CosmicPreviewSmoke.Requested || !ready) return;
             if (!Application.isFocused)
             {
                 ReleasePointer();
@@ -73,9 +74,7 @@ namespace CityLife.World
             if (looking && mouse != null)
             {
                 Vector2 delta = mouse.delta.ReadValue();
-                yaw += delta.x * LookSensitivity;
-                pitch = Mathf.Clamp(pitch - delta.y * LookSensitivity, -85f, 85f);
-                Camera.transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+                SetLook(yaw + delta.x * LookSensitivity, pitch - delta.y * LookSensitivity);
             }
             Vector3 input = Vector3.zero;
             bool fast = false;
@@ -94,6 +93,7 @@ namespace CityLife.World
 
         private void Move(Vector3 input, bool fast, float seconds)
         {
+            lastSweepCollider = null;
             Vector3 before = Camera.transform.position;
             if (flying)
             {
@@ -132,7 +132,10 @@ namespace CityLife.World
             Vector3 top = from - Vector3.up * .25f;
             if (Physics.CapsuleCast(bottom, top, BodyRadius, delta / distance, out RaycastHit hit,
                 distance + Skin, CollisionMask, QueryTriggerInteraction.Ignore))
+            {
+                lastSweepCollider = hit.collider;
                 return from + delta / distance * Mathf.Max(0f, Mathf.Min(distance, hit.distance - Skin));
+            }
             return to;
         }
 
@@ -142,7 +145,10 @@ namespace CityLife.World
             if (distance < .00001f) return from;
             if (Physics.SphereCast(from, .25f, delta / distance, out RaycastHit hit,
                 distance + Skin, CollisionMask, QueryTriggerInteraction.Ignore))
+            {
+                lastSweepCollider = hit.collider;
                 return from + delta / distance * Mathf.Max(0f, Mathf.Min(distance, hit.distance - Skin));
+            }
             return to;
         }
 
@@ -180,6 +186,7 @@ namespace CityLife.World
 
         private void ReleasePointer()
         {
+            if (CosmicPreviewSmoke.Requested) return;
             if (!looking) return;
             looking = false;
             Cursor.lockState = CursorLockMode.None;
@@ -188,7 +195,7 @@ namespace CityLife.World
 
         private void OnApplicationFocus(bool focused)
         {
-            if (focused) return;
+            if (CosmicPreviewSmoke.Requested || focused) return;
             ReleasePointer();
             if (ready) RecordChangedInput(Vector3.zero, false);
         }
@@ -207,7 +214,8 @@ namespace CityLife.World
             {
                 action = action, mode = CurrentMode, secondsSinceStartup = Time.realtimeSinceStartup,
                 position = CameraPosition, rotation = Camera.transform.eulerAngles, direction = input,
-                looking = looking, fast = fast, travelledMetres = (float)TravelledMetres
+                looking = looking, fast = fast, travelledMetres = (float)TravelledMetres,
+                automatic = CosmicPreviewSmoke.Requested
             }));
         }
 
@@ -250,7 +258,7 @@ namespace CityLife.World
 
         private void OnGUI()
         {
-            if (!ready) return;
+            if (CosmicPreviewSmoke.Requested || !ready) return;
             if (titleStyle == null)
             {
                 titleStyle = new GUIStyle(GUI.skin.label) { fontSize = 17, fontStyle = FontStyle.Bold, wordWrap = true };
@@ -264,7 +272,7 @@ namespace CityLife.World
             GUI.backgroundColor = new Color(.025f, .045f, .085f, .86f);
             GUI.Box(new Rect(12, 12, panelWidth, 132), GUIContent.none);
             GUI.backgroundColor = priorBackground;
-            GUI.Label(new Rect(24, 20, panelWidth - 24, 26), "Kooker: Starfall — WIP local preview", titleStyle);
+            GUI.Label(new Rect(24, 20, panelWidth - 24, 26), "Kooker: Starfall — WIP local preview " + Application.version, titleStyle);
             GUI.Label(new Rect(24, 48, panelWidth - 24, 35), "Tree and blue giant study · terrain, galaxy and living sea in development", bodyStyle);
             GUI.Label(new Rect(24, 84, panelWidth - 24, 35), "WASD move · hold RMB look · Shift faster · F walk/fly · Q / E fly · Esc release", bodyStyle);
             GUI.Label(new Rect(24, 120, panelWidth - 24, 20), CurrentMode + " · " + TravelledMetres.ToString("F1", CultureInfo.InvariantCulture) + " m travelled" + (evidenceDirectory == null ? "" : " · F12 capture"), statusStyle);
@@ -277,7 +285,37 @@ namespace CityLife.World
             public string action, mode;
             public float secondsSinceStartup, travelledMetres;
             public Vector3 position, rotation, direction;
-            public bool looking, fast;
+            public bool looking, fast, automatic;
+        }
+
+        private void SetLook(float newYaw, float newPitch)
+        {
+            yaw = newYaw; pitch = Mathf.Clamp(newPitch, -85f, 85f);
+            Camera.transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
+        }
+
+        // These hooks exercise the same movement, casts and F transition as Update. They never
+        // read input or manipulate a pointer; scenario setup/teleports are recorded by the caller.
+        internal bool SmokeReady => ready;
+        internal Collider SmokeLastSweepCollider => lastSweepCollider;
+        internal bool SmokeGround(Vector3 point, out RaycastHit hit) => TryGround(point, out hit);
+        internal void SmokeAim(Vector3 target)
+        {
+            if (!CosmicPreviewSmoke.Requested || !ready) throw new InvalidOperationException("Smoke hook unavailable.");
+            Vector3 direction = target - CameraPosition;
+            SetLook(Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg,
+                -Mathf.Atan2(direction.y, new Vector2(direction.x, direction.z).magnitude) * Mathf.Rad2Deg);
+        }
+        internal void SmokeStep(Vector3 input, bool fast, float seconds)
+        {
+            if (!CosmicPreviewSmoke.Requested || !ready) throw new InvalidOperationException("Smoke hook unavailable.");
+            Move(Vector3.ClampMagnitude(input, 1f), fast, Mathf.Clamp(seconds, 0f, .05f));
+            RecordChangedInput(input, fast);
+        }
+        internal void SmokeToggleMode()
+        {
+            if (!CosmicPreviewSmoke.Requested || !ready) throw new InvalidOperationException("Smoke hook unavailable.");
+            ToggleMode(); RecordChangedInput(Vector3.zero, false);
         }
     }
 }

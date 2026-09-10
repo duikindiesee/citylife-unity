@@ -106,12 +106,13 @@ namespace CityLife.World.Editor
         private static AmbientRecord initialAmbient;
         private static Material[] diagnosticOriginalMaterials;
         private static Renderer diagnosticRenderer;
-        private static int ExpectedCaptures => ph02FamilyMode ? ph02SelectedShotIds.Length : woodDiagnosticMode ? 3 : ph02FittedMode ? 12 : ph01TangentMode ? (ph01OriginalSubsetsReady ? 12 : 8) : ph02CrownMode ? 8 : playablePreviewMode ? 2 : importedCandidateMode ? 12 : hybridMode ? 21 : 15;
+        private static int ExpectedCaptures => playablePreviewMode ? 2 : ph02FamilyMode ? ph02SelectedShotIds.Length : woodDiagnosticMode ? 3 : ph02FittedMode ? 12 : ph01TangentMode ? (ph01OriginalSubsetsReady ? 12 : 8) : ph02CrownMode ? 8 : importedCandidateMode ? 12 : hybridMode ? 21 : 15;
 
         public static void RenderBatch() => Run(false);
         public static void RenderImportedCandidates() => Run(true);
         public static void RenderHybridFamily() { hybridMode=true;Run(false); }
         public static void BuildPlayablePreview() { playablePreviewMode=true;hybridMode=true;Run(false); }
+        public static void BuildR19PlayablePreview() { playablePreviewMode=true;ph02FamilyMode=true;hybridMode=true;Run(false); }
         public static void RenderPH02CrownCandidate() { ph02CrownMode=true;Run(false); }
         public static void RenderPH01TangentComparison() { ph01TangentMode=true;Run(false); }
         public static void RenderPH02FittedSupport() { ph02FittedMode=true;Run(false); }
@@ -131,7 +132,7 @@ namespace CityLife.World.Editor
                 SetupPipeline();
                 SetupScene();
                 List<Shot> shots = woodDiagnosticMode ? BuildShots().Where(s=>s.Id.StartsWith("04-",StringComparison.Ordinal)||s.Id.StartsWith("05-",StringComparison.Ordinal)||s.Id.StartsWith("15-",StringComparison.Ordinal)).ToList() : ph02FittedMode ? BuildPH02FittedShots() : ph01TangentMode ? BuildPH01TangentShots() : ph02CrownMode ? BuildPH02Shots() : playablePreviewMode ? BuildPreviewShots() : importedCandidateMode ? BuildImportedShots() : BuildShots();
-                if(ph02FamilyMode)shots=shots.Where(s=>ph02SelectedShotIds.Contains(s.Id,StringComparer.Ordinal)).ToList();
+                if(ph02FamilyMode&&!playablePreviewMode)shots=shots.Where(s=>ph02SelectedShotIds.Contains(s.Id,StringComparer.Ordinal)).ToList();
                 foreach (Shot shot in shots)
                 {
                     shot.Configure();
@@ -151,9 +152,9 @@ namespace CityLife.World.Editor
                         {"Hidden/CityLife/KokerboomGasInspection",GasShader},
                         {"Hidden/CityLife/KokerboomAtmosphereInspection",AtmosphereShader},
                         {"Hidden/CityLife/KokerboomStarsInspection",StarShader}
-                    },outputDirectory);
+                    },outputDirectory,ph02FamilyMode,Argument("-previewSourceCommit",""),ph02FamilyMeshSha256);
                 }
-                Debug.Log("KOKERBOOM_RENDER_FINISHED " + relativeDirectory + "/metrics.json technicalChecks=" + technicalPass + "; visual acceptance requires independent critique.");
+                Debug.Log("KOKERBOOM_RENDER_FINISHED " + relativeDirectory + "/metrics.json technicalChecks=" + technicalPass + (playablePreviewMode&&ph02FamilyMode?"; frozen R19 integration evidence, not a new tree review.":"; visual acceptance requires independent critique."));
                 exitCode = technicalPass ? 0 : 3;
             }
             catch (Exception exception)
@@ -188,9 +189,11 @@ namespace CityLife.World.Editor
             {
                 // Building the shot declarations does not execute any Configure callback.
                 // Resolve against this actual PH02 catalogue before creating a scene/tree.
-                ph02SelectedShotIds=ResolvePH02ShotSelection(ph02ShotSelectionRequested?Argument("-ph02Shots",""):null,BuildShots().Select(s=>s.Id).ToArray());
-                ph02FoliageTint=float.Parse(Argument("-ph02FoliageTint","0"),CultureInfo.InvariantCulture);
+                if(playablePreviewMode&&ph02ShotSelectionRequested)throw new ArgumentException("R19 preview uses its two fixed study views.");
+                ph02SelectedShotIds=playablePreviewMode?BuildPreviewShots().Select(s=>s.Id).ToArray():ResolvePH02ShotSelection(ph02ShotSelectionRequested?Argument("-ph02Shots",""):null,BuildShots().Select(s=>s.Id).ToArray());
+                ph02FoliageTint=float.Parse(Argument("-ph02FoliageTint",playablePreviewMode?"1":"0"),CultureInfo.InvariantCulture);
                 if(float.IsNaN(ph02FoliageTint)||float.IsInfinity(ph02FoliageTint)||ph02FoliageTint<0||ph02FoliageTint>1)throw new ArgumentOutOfRangeException("ph02FoliageTint");
+                if(playablePreviewMode&&(seed!=4242||ph02FoliageTint!=1))throw new ArgumentException("Frozen R19 preview requires seed4242 and foliage tint1.");
             }
             if (width < 800 || width > 3840) throw new ArgumentException("Width must be between 800 and 3840 pixels.");
             relativeDirectory = "evidence/milestones/kokerboom/" + round;
@@ -1697,6 +1700,13 @@ ENDHLSL
                 timingScope = "Per-image render plus synchronous readback wall time after three warmup requests. Not gameplay FPS or a sustained runtime benchmark.",
                 errors = errors, warnings = warnings, expectedCaptures = ExpectedCaptures, captures = results.ToArray()
             };
+            if(playablePreviewMode&&ph02FamilyMode)
+            {
+                report.mode="frozen-r19-playable-preview-stage";
+                report.status=passed?"Frozen R19 prebuild captures completed":"Technical rendering failure; see local editor log";
+                report.scope="Two existing study views before a separately versioned player bake. Frozen R19 PH02 family, seed4242, foliage tint1. No new tree polishing, wider landscape or full-family review.";
+                report.visualAcceptance="R19 review remains frozen at7.375/10; these captures establish build integration only. Native player evidence is separate.";
+            }
             File.WriteAllText(Path.Combine(outputDirectory, "metrics.json"), JsonUtility.ToJson(report, true));
         }
 

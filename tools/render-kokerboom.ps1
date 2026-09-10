@@ -6,6 +6,7 @@ param(
     [switch]$ImportedCandidates,
     [switch]$Hybrid,
     [switch]$PlayablePreview,
+    [switch]$R19PlayablePreview,
     [switch]$PH02Crown,
     [switch]$PH01Tangents,
     [switch]$PH02Fitted,
@@ -37,7 +38,20 @@ $localLogs = Join-Path $projectPath 'evidence\local'
 New-Item -ItemType Directory -Force -Path $localLogs | Out-Null
 $stamp = [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss')
 $logPath = Join-Path $localLogs "kokerboom-$Round-$stamp.log"
-if(([int]$ImportedCandidates.IsPresent+[int]$Hybrid.IsPresent+[int]$PlayablePreview.IsPresent+[int]$PH02Crown.IsPresent+[int]$PH01Tangents.IsPresent+[int]$PH02Fitted.IsPresent+[int]$WoodDiagnostic.IsPresent+[int]$PH02Family.IsPresent) -gt 1){throw 'Select one inspection mode.'}
+if(([int]$ImportedCandidates.IsPresent+[int]$Hybrid.IsPresent+[int]$PlayablePreview.IsPresent+[int]$R19PlayablePreview.IsPresent+[int]$PH02Crown.IsPresent+[int]$PH01Tangents.IsPresent+[int]$PH02Fitted.IsPresent+[int]$WoodDiagnostic.IsPresent+[int]$PH02Family.IsPresent) -gt 1){throw 'Select one inspection mode.'}
+$previewSourceCommit=''
+if($R19PlayablePreview){
+    if($Seed -ne 4242){throw 'Frozen R19 preview requires seed4242.'}
+    $previewSourceCommit=(& git -C $projectPath rev-parse HEAD).Trim()
+    if($LASTEXITCODE -ne 0 -or $previewSourceCommit -notmatch '^[0-9a-f]{40}$'){throw 'Cannot resolve exact preview source commit.'}
+    $sourceChanges=@(& git -C $projectPath status --porcelain -- Assets Packages ProjectSettings tools)
+    if($LASTEXITCODE -ne 0 -or $sourceChanges.Count){throw 'Commit the preview source before baking, so the player maps to an exact source commit.'}
+    $frozen=Get-Content -LiteralPath (Join-Path $projectPath 'evidence/verified/starfall-tree-baseline.json') -Raw | ConvertFrom-Json
+    foreach($inputFile in $frozen.frozenR19Candidate.sourceFiles){
+        if($inputFile.source -in @('Assets/CityLife/Editor/KokerboomRender.cs','tools/render-kokerboom.ps1')){continue}
+        if((Get-FileHash -LiteralPath (Join-Path $projectPath $inputFile.source) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $inputFile.sha256){throw "Frozen R19 input changed: $($inputFile.source)"}
+    }
+}
 # Optional PH02 shot subset; all existing 21 shots remain the default.
 $ph02ShotSelectionRequested=$PSBoundParameters.ContainsKey('PH02Shots')
 $ph02SelectedNumbers=@()
@@ -84,6 +98,7 @@ if($PH02Fitted -and $PSBoundParameters.ContainsKey('PH02CutHeight')){throw 'PH02
 if($WoodDiagnostic -and $Seed -ne 4242){throw 'WoodDiagnostic preserves the R09 seed4242 main specimen.'}
 $entryPoint = if($PH02Family) { 'CityLife.World.Editor.KokerboomRender.RenderPH02Family' } elseif($WoodDiagnostic) { 'CityLife.World.Editor.KokerboomRender.RenderWoodDiagnostic' } elseif($PH02Fitted) { 'CityLife.World.Editor.KokerboomRender.RenderPH02FittedSupport' } elseif($PH01Tangents) { 'CityLife.World.Editor.KokerboomRender.RenderPH01TangentComparison' } elseif($PH02Crown) { 'CityLife.World.Editor.KokerboomRender.RenderPH02CrownCandidate' } elseif($PlayablePreview) { 'CityLife.World.Editor.KokerboomRender.BuildPlayablePreview' } elseif ($ImportedCandidates) { 'CityLife.World.Editor.KokerboomRender.RenderImportedCandidates' } elseif($Hybrid) { 'CityLife.World.Editor.KokerboomRender.RenderHybridFamily' } else { 'CityLife.World.Editor.KokerboomRender.RenderBatch' }
 $expectedCaptures = if($ph02ShotSelectionRequested) { $ph02SelectedNumbers.Count } elseif($PH02Family) { 21 } elseif($WoodDiagnostic) { 3 } elseif($PH02Fitted) { 12 } elseif($PH01Tangents -or $PH02Crown) { 8 } elseif($PlayablePreview) { 2 } elseif ($ImportedCandidates) { 12 } elseif($Hybrid) { 21 } else { 15 }
+if($R19PlayablePreview){$entryPoint='CityLife.World.Editor.KokerboomRender.BuildR19PlayablePreview';$expectedCaptures=2}
 $arguments = @('-batchmode', '-force-d3d11', '-projectPath', ('"' + $projectPath + '"'),
     '-executeMethod', $entryPoint,
     '-kokerboomRound', $Round, '-kokerboomSeed', $Seed.ToString([Globalization.CultureInfo]::InvariantCulture),
@@ -94,6 +109,7 @@ if($PH01Tangents){$arguments+=@('-ph01ExactTupleDedup',([int]$ExactTupleDedup.Is
 if($PH02Fitted){$arguments+=@('-ph02ImportedTuples',([int]$PH02ImportedTuples.IsPresent).ToString([Globalization.CultureInfo]::InvariantCulture))}
 if($PH02Family){$arguments+=@('-ph02FoliageTint',$PH02FoliageTint.ToString('R',[Globalization.CultureInfo]::InvariantCulture))}
 if($ph02ShotSelectionRequested){$arguments+=@('-ph02Shots',($ph02SelectedNumbers -join ','))}
+if($R19PlayablePreview){$arguments+=@('-previewSourceCommit',$previewSourceCommit)}
 # Graphics remain enabled. Batch mode + a hidden process do not activate a desktop editor window.
 # The render entry point exits the process itself; -quit and -nographics are deliberately absent.
 $renderProcess = Start-Process -FilePath $EditorPath -ArgumentList $arguments -WindowStyle Hidden -PassThru
@@ -111,6 +127,11 @@ if ($exitCode -ne 0 -or -not (Test-Path -LiteralPath $metricsPath)) {
     throw "Kokerboom rendering failed (exit $exitCode). Existing evidence is retained. Inspect $logPath"
 }
 $report = Get-Content -Raw -LiteralPath $metricsPath | ConvertFrom-Json
+if($R19PlayablePreview){
+    if($report.mode -ne 'frozen-r19-playable-preview-stage' -or $report.ph02FoliageTintStrength -ne 1 -or -not $report.ph02FamilyChecks.numericChecksPassed -or -not $report.ph02FamilyMeshReadbackPassed){throw 'Frozen R19 component, tint or mode did not pass.'}
+    $buildRecord=Get-Content -LiteralPath (Join-Path $outputDirectory 'preview-build.json') -Raw | ConvertFrom-Json
+    if($buildRecord.status -ne 'Succeeded' -or $buildRecord.version -ne '0.0.2-preview.1' -or $buildRecord.sourceCommit -ne $previewSourceCommit){throw 'Separate R19 player did not build from the recorded source.'}
+}
 $expectedPH02Mode=if($ph02ShotSelectionRequested){'hybrid-ph02-fitted-crown-scoped-inspection'}else{'hybrid-ph02-fitted-crown-family-experiment'}
 if($PH02Family -and ($report.mode -ne $expectedPH02Mode -or -not $report.ph02FamilyChecks.numericChecksPassed -or -not $report.ph02FamilyChecks.actualImportedGatePassed -or -not $report.ph02FamilyMeshReadbackPassed -or $report.ph02FoliageTintStrength -ne $PH02FoliageTint)){
     throw 'PH02 family component or requested tint did not pass the recorded technical checks. Component checks do not constitute full-family acceptance.'
@@ -159,12 +180,12 @@ if($ph02ShotSelectionRequested){
     } | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $ph02CameraComparisonPath -Encoding utf8NoBOM
 }
 [pscustomobject]@{
-    status = if($ph02ShotSelectionRequested){'Rendered scoped PH02 inspection; not a full-family review set'}else{'Rendered for independent critique'}
+    status = if($R19PlayablePreview){'Built separate frozen R19 player; runtime validation remains separate'}elseif($ph02ShotSelectionRequested){'Rendered scoped PH02 inspection; not a full-family review set'}else{'Rendered for independent critique'}
     round = $Round
     images = @($report.captures).Count
     metrics = $metricsPath
     log = $logPath
     cameraComparison = $ph02CameraComparisonPath
-    visualAcceptance = if($ph02ShotSelectionRequested){'Not scored; selected shots are not a full-family evidence set.'}else{'Not scored; independent critique required.'}
+    visualAcceptance = if($R19PlayablePreview){'R19 review remains frozen; this is build integration only.'}elseif($ph02ShotSelectionRequested){'Not scored; selected shots are not a full-family evidence set.'}else{'Not scored; independent critique required.'}
     selectedShotIds = if($PH02Family){@($report.ph02SelectedShotIds)}else{@()}
 } | ConvertTo-Json
