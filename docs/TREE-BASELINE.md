@@ -1,5 +1,7 @@
 # Tree baseline and closeout
 
+**Later authorized integration:** [0.0.2-preview.1](RELEASE-0.0.2-preview.1.md) now provides a separate R19 player. The freeze below is preserved historical context; its no-new-build statements describe the closeout scope at that time. R06 stays the retained visual reference and its bytes/process were preserved. No tree polishing was reopened.
+
 **R06 is the user-approved visual reference.** The user is satisfied with the running R06 tree and directed this work to stop after the numerical check and full R19 review, both now complete. There will be no further tree-polishing rounds to chase the historical 9/10 target. Remaining critic defects are **deferred**. This supersedes the earlier requirement to pass the tree rubric before world work.
 
 The preserved Starfall study player is the R06 `CosmicWorldPreview.exe`. It remains untouched. R17/R18 are scoped experiments, and R19 is a separate offscreen experimental candidate; none is automatically promoted to the player or approved visual baseline. The wider world is later direction, not additional work in this closeout.
