@@ -35,10 +35,11 @@ try {
             $source = [IO.Path]::GetFullPath((Join-Path $projectRoot $relative))
             if (-not $source.StartsWith($projectRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'Candidate escaped project root.' }
             if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { continue }
-            if ((Get-Item -LiteralPath $source).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Do not publish symlinked runtime state.' }
+            # Git includes dotfiles; PowerShell on Linux needs -Force to inspect them.
+            if ((Get-Item -LiteralPath $source -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Do not publish symlinked runtime state.' }
             $destination = Join-Path $candidateFolder $relative
             $null = New-Item -ItemType Directory -Force -Path ([IO.Path]::GetDirectoryName($destination))
-            Copy-Item -LiteralPath $source -Destination $destination
+            Copy-Item -LiteralPath $source -Destination $destination -Force
         }
         & $binary dir '--redact=100' --verbose --no-banner --no-color --ignore-gitleaks-allow $candidateFolder
         if ($LASTEXITCODE -ne 0) { throw 'Gitleaks publishable-file scan failed. No findings artifact is uploaded.' }
