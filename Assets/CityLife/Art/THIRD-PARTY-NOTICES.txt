@@ -1,5 +1,6 @@
 CITYLIFE ISLAND - THIRD-PARTY ART NOTICES
-Verified 2026-09-09
+Texture/preview entries verified 2026-09-09.
+Quiver-tree comparison candidate entries verified 2026-09-10.
 
 1. Dry Mud Field 001 (1K diffuse texture)
 Publisher: Poly Haven
@@ -18,6 +19,48 @@ Included source entries: Isometric/rock_largeA_SE.png; Isometric/grass_large_SE.
 Licence: CC0 1.0 Universal (CC0-1.0), stated in the package's License.txt.
 Only the unmodified catalogue previews are retained. The corresponding 3D models
 are not included in the island as third-party models.
+
+3. Quiver Tree 01 - comparison candidate
+Publisher: Poly Haven
+Creators: Dario Barresi and James Ray Cock (photography), Rico Cilliers (modelling)
+Source: https://polyhaven.com/a/quiver_tree_01
+Publisher licence: https://polyhaven.com/license
+Licence: CC0 1.0 Universal (CC0-1.0)
+Included repository files: the 2K FBX option and its six included textures,
+unchanged. Exact file URLs and hashes are in
+Assets/CityLife/Art/PolyHaven/QuiverTree01/provenance.json.
+
+4. Quiver Tree 02 - comparison candidate
+Publisher: Poly Haven
+Creators: Dario Barresi (photography), Rico Cilliers (modelling)
+Source: https://polyhaven.com/a/quiver_tree_02
+Publisher licence: https://polyhaven.com/license
+Licence: CC0 1.0 Universal (CC0-1.0)
+Included repository files: the 2K FBX option and its four included textures,
+unchanged. Exact file URLs and hashes are in
+Assets/CityLife/Art/PolyHaven/QuiverTree02/provenance.json.
+
+The two Poly Haven quiver trees are imported comparison candidates. They are
+not integrated into the world or claimed visually accepted. The publisher's
+common names are retained; no Latin species is asserted for these assets.
+Their presence here does not change the contents of an earlier player package.
+
+R05 PH01 derivative experiment: the downloaded FBX/textures remain unchanged,
+but five extracted groups of 21 source leaves are placed on modified procedural
+architecture. Source UVs/normals are retained with coordinate and pivot changes;
+generated materials use a modest leaf tint and interior source-atlas bark regions.
+Separate unidentified basal pieces are diagnostic-only (18-21), not part of the
+hybrid trees. This derivative is distinct from R03's original-model comparison;
+no accepted world integration or fresh full numeric/bake/LOD validation is claimed.
+
+
+Editor-generated PH02 crown derivative trial (2026-09-10): source downloads stay
+unchanged. The explicit 0.65m horizontal cut preserves original vertex normals
+and polygon-corner UVs, interpolating boundary attributes in metre/Y-up output.
+The boundary stays open; no cap/socket/weld is added. A separate gray open
+support tests a translated attachment, without changing the source crown scale.
+Full/cut/attached comparison is unaccepted; complete leaves and fit need actual
+3D review. Source taxonomy remains publisher-labelled quiver tree only.
 
 These assets are public-domain/CC0 resources, available free from their creators.
 Commercial use, modification and redistribution are permitted; attribution is
@@ -166,7 +209,8 @@ express Statement of Purpose.
 	License: (Creative Commons Zero, CC0)
 	http://creativecommons.org/publicdomain/zero/1.0/
 
-	This content is free to use in personal, educational and commercial projects.
+	This content is free to use in personal, educational and commercial projects.
+
 	Support us by crediting Kenney or www.kenney.nl (this is not mandatory)
 
 			------------------------------

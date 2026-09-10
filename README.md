@@ -1,79 +1,91 @@
-# CityLife Island — Unity
+<div align="center">
 
-An island foundation preview for CityLife, built with Unity 6.6 / URP. The first milestone is a larger desert island to explore, carrying forward the browser game's sand, turquoise sea, quiver-tree forms and alien-sky direction. Roads, plots and the house-building tools will be designed deliberately in later milestones.
+# ✦ Kooker: Starfall
 
-![Actual Unity offscreen island overview](evidence/milestones/04a-arid-overview-2026-09-09.png)
+**Where the sky becomes a world.**
 
-![Actual Unity close-up: dry grass, soil and rocks](evidence/milestones/04d-grass-closeup-2026-09-09.png)
+A world in the making · Unity 6 · Windows preview
 
-Actual Unity scene output at 1600×900. This offscreen capture excludes the interface. Earlier native-window images and the ground-level before/after sequence are retained in the [visual milestone catalogue](docs/VISUAL-MILESTONES.md). Native keyboard/mouse acceptance remains outstanding; the [verification record](docs/VERIFICATION.md) separates it from automated scene checks.
+[Explore the direction](docs/STARFALL.md) · [Visual progress](docs/KOKERBOOM-VISUAL-REVIEW.html) · [Build & run](#-build--run) · [Credits](docs/ASSET-CREDITS.md)
 
-This repository starts a **new versioned island**. It does not overwrite the browser game or claim to import existing residents, roads, houses or world edits. The seed is 4242; the generation settings and algorithm version together identify the base world. The original CityLife random/noise/elevation maths is ported and compared with independent reference values from the pinned browser source. River carving and the old road layout are intentionally omitted.
+</div>
 
-## Open and build
+![WIP: actual Unity R16 tree study beneath the blue gas giant](evidence/milestones/kokerboom/round-16/2026-09-10-08-cosmic-gameplay-eye-level.png)
 
-For a packaged Windows preview, extract the entire ZIP and open `CityLife.exe`. Keep its data folder and DLLs together. See the included `README.txt` for controls and acceptance limits. No Unity installation or CityLife sign-in is required for the offline player.
+*Actual Unity URP output, 10 September 2026 · R16 tree study · WIP. This offscreen image shows a later tree revision than the currently built R06 player. It is not concept art or a finished world.*
 
-Open this directory with **Unity 6000.6.0f1**. URP 17.6.0 and Input System 1.20.0 are pinned in `Packages/manifest.json`. Open `Assets/CityLife/Scenes/Island.unity`, then Play. For a first checkout before that scene has been prepared, choose **CityLife → Prepare island scene**.
+Beneath a blue giant and a river of stars, warm desert gives way to luminous seas. Explore, shape, and one day inhabit a world still becoming.
 
-From PowerShell with a licensed editor:
+**That is the destination. Today, Starfall is an approximately 60 m tree and blue-giant study** with a separate local Windows preview. The sculpted landscape, visible galaxy and living sea are planned. World shaping, houses, building tools, inhabitants, bots and shared-world connections are future work.
 
-```powershell
-& 'C:\Program Files\Unity\Hub\Editor\6000.6.0f1\Editor\Unity.exe' -batchmode -quit -projectPath $PWD -buildTarget StandaloneWindows64 -executeMethod CityLife.World.Editor.CityLifeBuild.BuildWindows -logFile "$PWD\evidence\local\build.log"
-```
+## 🌌 The world ahead
 
-The build command runs source parity, deterministic regeneration and edit-persistence checks before building `Builds/Windows/CityLife.exe`. The Windows player is self-contained and does not need a Unity installation or CityLife login. `tools/build.ps1` runs the same command and retains a timestamped local log. The command-line build follows the [Unity player build documentation](https://docs.unity3d.com/6000.0/Documentation/Manual/build-command-line.html).
+| Element | Direction | Current state |
+|---|---|---|
+| Trees | Gold and ochre kokerboom trunks, rounded crowns and cool blue-green rosettes | Deterministic 3D family under review |
+| Land | Warm sculpted mesas, rocky shores and turquoise bays | Small ground study only |
+| Sky | A large blue gas giant, moons and a distant galaxy | Prototype giant and stars; wider sky work planned |
+| Sea | Clear shallows, submerged arches, kelp-like growth, coral forms, fish schools and rays | [Living sea design](docs/STARFALL-LIVING-SEA.md); unimplemented |
+| Life and building | Explore, shape and eventually inhabit the world | Future scope |
 
-Use `tools/build.ps1 -BuildName Candidate` to build into a separate directory while another player is open. `tools/package.ps1 -BuildName Candidate` packages that build and writes its SHA256 checksum under `Builds/Download`. Neither command changes or launches the existing player window.
+The [visual direction](docs/KOKERBOOM-REFERENCE.md) records the concept references separately from actual Unity evidence. The new landscape will have its own versioned world definition, preserving the earlier island and its saved edits.
 
-## Explore
+## 🌳 Watch the trees take shape
 
-WASD moves, right mouse looks, Shift moves faster. Q/E changes altitude while flying; the wheel adjusts speed or orbit distance. F switches walking/flying. O orbits. Home shows the island; 1 visits Landing, 2 the summit, 3 open land for future development. N switches day/night. H hides the interface. F12 saves a screenshot; F9 records a performance sample; Shift + F9 runs a repeatable route. See [the complete controls and measurement notes](docs/exploration.md).
+[![Actual Unity R16 neutral tree inspection, still under review](evidence/milestones/kokerboom/round-16/2026-09-10-02-neutral-three-quarter.png)](docs/KOKERBOOM-VISUAL-REVIEW.html)
 
-## Evidence and architecture
+*Actual Unity R16 neutral inspection · WIP. Open the local [visual review catalogue](docs/KOKERBOOM-VISUAL-REVIEW.html) in a browser to compare preserved rounds and camera views. GitHub displays the HTML source; the [Markdown milestone index](docs/VISUAL-MILESTONES.md) is readable there directly.*
 
-- [Visual milestone catalogue](docs/VISUAL-MILESTONES.md) — real source/player captures, retained in sequence.
-- [Source, identity and scope](docs/SOURCE-AND-SCOPE.md) — exact reused concepts, intentional changes, source hashes and deferred integrations.
-- [World format and rendering](docs/WORLD-FOUNDATION.md) — physical scale, deterministic base, separate edits and distance LOD.
-- [Verification record](docs/VERIFICATION.md) — claims, evidence and remaining gaps.
-- [Free-asset visual catalogue](docs/ASSET-CATALOGUE.md) and [credits](docs/ASSET-CREDITS.md) — previews, licences and actual integration status.
-- [CI and public-repository safeguards](docs/CI.md) — source workflow provenance, secret scanning and build constraints.
+The latest full-family review is **R16: 5.75/10, not accepted**. Botanical fidelity is **6.75/10** and art identity **5.75/10**. Both must reach **9/10 with no major defect** before the tree family anchors the larger landscape. The critic retains the fuller PH02 rosettes; support-to-branch seams, bend shading, ground contact, bark peeling and blue-green foliage under ordinary game light remain active work. All 21 images were independently reviewed. The main R16 tree has **6,591,379 triangles** and took **517,901 ms** to create cold in the editor ([authoring record](evidence/verified/kokerboom-round-16-authoring-cost.json)); this is authoring cost, not FPS. See the [exact critique](docs/KOKERBOOM-CRITIQUE.md#round-16-ph02-fitted-crown-family-rejected).
 
-## Game and repository layout
+## 🎮 Build & run
 
-The world has five convenient viewpoints: Island vista shows its extent; Landing coast starts ground-level exploration; Highlands shows the raised interior; Neighbourhood reserve identifies open land for later design; **4 / Detail** frames an existing dry grass tuft near Landing. The reserve is a view label, not a plot or ownership system.
+Use **Unity 6000.6.0f1** with Windows build support. URP **17.6.0** and Input System **1.20.0** are pinned in [Packages/manifest.json](Packages/manifest.json).
 
-| Directory | Purpose |
+From the repository root, build the separate preview with a fresh evidence round:
+
+~~~powershell
+.\tools\render-kokerboom.ps1 -Round round-100 -PlayablePreview
+~~~
+
+Choose an unused round number; the label only identifies evidence and does not affect world generation. The script renders two study views and bakes a Windows player into `Builds/KookerStarfall-<UTC>/`. It preserves earlier captures, refuses to run alongside another Unity editor and does not launch the player. Open `KookerStarfall.exe` from the resulting folder; keep the data folder and DLLs beside it.
+
+**The Starfall branding is source-only until this new build is verified.** The retained [R06 build record](evidence/milestones/kokerboom/round-06/preview-build.json) refers to the earlier `CosmicWorldPreview.exe`, which has already been used as a local WIP preview. The latest R16 images are not screenshots of that executable. The [checked R06 package](evidence/verified/starfall-r06-package-check.json), `Kooker-Starfall-WIP-R06-Windows.zip` (161.42 MiB), preserves all 183 runtime files unchanged; packaging did not rebuild the player.
+
+| Control | Action |
 |---|---|
-| `Assets/CityLife/Scenes` | Runnable island scene |
-| `Assets/CityLife/Scripts` | Seeded field, edit overlay, renderer and walk/fly/orbit controls |
-| `Assets/CityLife/Resources` | Versioned world definition and independent source test vectors |
-| `Assets/CityLife/Shaders` / `Art` | URP scene materials, procedural visuals and credited imported art |
-| `Assets/CityLife/Editor` | Scene preparation, meaningful world checks and Windows build entry point |
-| `Assets/Settings` / `ProjectSettings` / `Packages` | Reproducible editor, rendering and package configuration |
-| `tools` / `.github` | Build, isolated scene test, package and repository checks |
-| `docs` / `evidence` | Architecture, licences, milestone images and reviewed verification reports |
+| WASD | Move |
+| Hold right mouse button | Look |
+| Shift | Move faster |
+| F | Switch walk / inspection flight |
+| Q / E | Lower / raise flight height |
+| Escape | Release the pointer |
+| Alt + Enter | Toggle window / fullscreen |
 
-`Builds`, `Library`, raw local logs, player state and downloaded archives are not source-control deliverables. Reviewed evidence uses repository-relative artifact references.
+Walking follows the ground at 1.85 m eye clearance and stays within the study. This is an inspection controller; rocks do not yet have complete collision. F12 capture requires an explicit absolute folder passed with `-previewEvidence`; the preview does not capture automatically.
 
-## Implemented and planned
+The preview has no implemented multiplayer, bot connections or saved-world loading. Offline operation and engine telemetry have not been fully validated. Legacy island build commands and controls remain in the [earlier island guide](docs/LEGACY-ISLAND.md).
 
-| Area | Current scope |
+## Evidence at a glance
+
+| Claim | Status | Evidence | Remaining gap |
+|---|---|---|---|
+| Separate Windows study | R06 build succeeded; local WIP used | [Build record](evidence/milestones/kokerboom/round-06/preview-build.json) | Full native controls, collision and measured performance acceptance |
+| Latest full tree family | R16 rejected, overall 5.75/10 | [21-view manifest](evidence/milestones/kokerboom/round-16/metrics.json), [independent critique](docs/KOKERBOOM-CRITIQUE.md#round-16-ph02-fitted-crown-family-rejected) | Both visual means ≥9; no major defect |
+| Changed PH02 family | **Numeric FAIL at assertion 522:** full-age root extends below the unchanged −1 m floor | [Exact failure report](evidence/verified/kokerboom-round-16-ph02-validation-failed.json) | Repair buried root geometry and rerun; visual score remains 5.75, rejected |
+| Starfall branding | Repository renamed; source updated | [Naming and continuity record](docs/STARFALL.md) | Branded build and runtime verification |
+| Wider world and living sea | Planned | [World direction](docs/STARFALL.md), [sea plan](docs/STARFALL-LIVING-SEA.md) | Implementation and actual scene evidence |
+
+## 🧭 Project guide
+
+| Start here | Reference |
 |---|---|
-| World | Versioned 4.096km region, approximately 6.007km² of sampled land, deterministic source-derived generation |
-| Exploration | Walk/fly/orbit code, named views, day/night preview, screenshots and automatic tour; scripted travel tested, native control acceptance pending |
-| Persistence | Base definition and separately fingerprinted terrain edits; atomic save/reload and rejection tests; no in-game edit tool yet |
-| Appearance | Chunked terrain and sea, arid vegetation/detail iteration; actual evidence and asset status documented separately |
-| Later milestones | Unity road/plot/house tools, imported HQ buildings, browser-save migration where explicitly designed, authoritative shared state and private household connections |
+| World direction and naming | [Starfall](docs/STARFALL.md) · [Living sea](docs/STARFALL-LIVING-SEA.md) |
+| Images and review | [Visual catalogue](docs/KOKERBOOM-VISUAL-REVIEW.html) · [Milestones](docs/VISUAL-MILESTONES.md) · [Tree critique](docs/KOKERBOOM-CRITIQUE.md) |
+| Assets and provenance | [Asset catalogue](docs/ASSET-CATALOGUE.md) · [Credits](docs/ASSET-CREDITS.md) · [Portable notices](Assets/CityLife/Art/THIRD-PARTY-NOTICES.txt) |
+| Determinism and saved edits | [World foundation](docs/WORLD-FOUNDATION.md) · [Legacy island](docs/LEGACY-ISLAND.md) |
+| Verification and contribution | [Evidence record](docs/VERIFICATION.md) · [CI and safeguards](docs/CI.md) |
 
-The initial region is 4096×4096 metres with a 4 m base grid and 256 m mesh chunks. Land occupies only part of that square; the UI reports measured land area. Distance-based mesh detail keeps the distant island affordable. It is not an infinite world or an implemented network streaming service.
+The repository is [duikindiesee/kooker-starfall](https://github.com/duikindiesee/kooker-starfall). Its history and draft review continue under the new name. Internal `CityLife.World` namespaces, `Assets/CityLife` paths, legacy product settings, world IDs and save contracts remain intact; branding does not migrate an existing world.
 
-Local world definitions and edits live in Unity's `Application.persistentDataPath/Worlds/<base-fingerprint>/`. The current executable is an offline exploration client; shared authoritative world state, household runtimes and the Kooker HQ integrations remain future work. No credentials or private runtime state are included.
-
-World generation settings are not a player save. Changing their fingerprint creates a different world identity; saved deltas from another definition are rejected before application. Future roads, houses and ownership need their own explicit durable contracts. See [the world format](docs/WORLD-FOUNDATION.md) before changing generation.
-
-## Validation and contributions
-
-`tools/build.ps1 -BuildName Candidate` runs the Unity world/persistence checks before producing the candidate player. `tools/smoke.ps1 -BuildName Candidate` launches a separate hidden process that renders an offscreen GPU route; it neither polls input nor changes cursor state or reads player saves. Its evidence excludes desktop presentation and native controls. A licensed Unity editor is needed to build, while repository CI runs the available independent checks described in [CI.md](docs/CI.md).
-
-Work lands through branches and pull requests. Main requires review. Retain source provenance and asset licence notices, scan history and files for secrets, inspect the actual package, and update the evidence record for material changes. Do not commit private archives, operator configuration, credentials or player data.
+Contribute through branches and pull requests. Retain provenance, licences and earlier evidence. Keep credentials, private runtime profiles, player state, downloaded archives and raw machine logs out of the public repository.
