@@ -8,6 +8,7 @@ namespace CityLife.World
     public static class CoastalTerrain
     {
         public const string DefinitionId = "starfall.coastal-slice.v1";
+        public const string ContentRevision = "terrain-r2-weathered-banks";
         public const int Seed = 1904242;
         public const float MinX = -90f, MaxX = 90f, MinZ = -55f, MaxZ = 145f;
         public const float SeaLevel = CoastalWater.Level;
@@ -87,7 +88,7 @@ namespace CityLife.World
                 indices[cursor++] = at; indices[cursor++] = at + stride; indices[cursor++] = at + 1;
                 indices[cursor++] = at + 1; indices[cursor++] = at + stride; indices[cursor++] = at + stride + 1;
             }
-            var mesh = new Mesh { name = DefinitionId + " seed " + Seed + " continuous land and seabed", indexFormat = IndexFormat.UInt32 };
+            var mesh = new Mesh { name = DefinitionId + " " + ContentRevision + " seed " + Seed + " continuous land and seabed", indexFormat = IndexFormat.UInt32 };
             mesh.vertices = vertices; mesh.uv = uv; mesh.triangles = indices;
             mesh.RecalculateNormals(); mesh.RecalculateBounds();
             var material = new Material(shader) { name = "Coastal ochre strata and sandy shelves - procedural" };
@@ -107,10 +108,19 @@ namespace CityLife.World
             float warpX = Noise(x*.041f+salt,z*.041f)*2.5f;
             float warpZ = Noise(x*.039f,z*.039f+salt)*2.2f;
             float dx=(x-cx+warpX)/rx,dz=(z-cz+warpZ)/rz;
-            float shoulder = 1f - Mathf.Sqrt(dx*dx+dz*dz);
-            float rise = Smooth(-.16f,.22f,shoulder);
-            float terraces = rise*.80f + Smooth(.21f,.34f,rise)*.07f + Smooth(.48f,.60f,rise)*.08f + Smooth(.76f,.89f,rise)*.05f;
-            return terraces * (height + Noise(x*.085f+salt,z*.085f)*1.4f);
+            float radial = Mathf.Sqrt(dx*dx+dz*dz);
+            float nx=dx/Mathf.Max(radial,.001f),nz=dz/Mathf.Max(radial,.001f);
+            // Directional erosion makes broad buttresses/gullies continuous around the
+            // mass. Unlike an angle lookup it has no +/-pi seam in the heightfield.
+            float buttress = Noise(nx*3.8f+salt,nz*3.8f);
+            float erosion = Noise(nx*7.3f+salt*.37f,nz*7.3f+salt);
+            float shoulder = 1f-radial + buttress*.085f + Noise(x*.12f+salt,z*.12f)*.025f;
+            float rise = Smooth(-.20f,.30f,shoulder);
+            float body = rise*.84f + Smooth(.37f,.60f,rise)*.10f + Smooth(.77f,.96f,rise)*.06f;
+            float talus = Smooth(-.41f,-.16f,shoulder)*(1f-Smooth(-.02f,.27f,shoulder))*height*.095f;
+            float gully = Smooth(.10f,.65f,erosion)*Smooth(-.19f,.04f,shoulder)*(1f-Smooth(.27f,.48f,shoulder))*2.4f;
+            float top = height + Noise(x*.078f+salt,z*.078f)*2.2f + Noise(x*.24f,z*.24f+salt)*.22f;
+            return Mathf.Max(0,body*top + talus - gully);
         }
 
         private static float Smooth(float low,float high,float value)

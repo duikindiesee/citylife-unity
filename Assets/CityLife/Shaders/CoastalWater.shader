@@ -2,9 +2,9 @@ Shader "CityLife/CoastalWater"
 {
     Properties
     {
-        _ShallowColor ("Luminous turquoise shallows", Color) = (.015,.64,.54,1)
-        _RiverColor ("Turquoise channel", Color) = (.008,.37,.46,1)
-        _DeepColor ("Deep blue sea", Color) = (.008,.045,.16,1)
+        _ShallowColor ("Luminous turquoise shallows", Color) = (.008,.83,.75,1)
+        _RiverColor ("Turquoise channel", Color) = (.004,.64,.72,1)
+        _DeepColor ("Deep blue sea", Color) = (.006,.12,.34,1)
         _SkyReflection ("Navy sky reflection", Color) = (.035,.085,.19,1)
         _FoamColor ("Fine shore edge", Color) = (.40,.85,.74,1)
         _WaterLevel ("World water level", Float) = -2
@@ -31,6 +31,7 @@ Shader "CityLife/CoastalWater"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
                 half4 _ShallowColor, _RiverColor, _DeepColor, _SkyReflection, _FoamColor;
@@ -117,6 +118,16 @@ Shader "CityLife/CoastalWater"
                 float deep = smoothstep(4,24,depth);
                 half3 water = lerp(_ShallowColor.rgb,_RiverColor.rgb,river);
                 water = lerp(water,_DeepColor.rgb,deep);
+                // R01's unfiltered alpha blend transmitted the strongly lit orange bed, turning
+                // turquoise gray/green. Preserve shallow detail through colour-filtered scene
+                // transmission instead. Increasing depth absorbs the bed; sky never acts as bed.
+                if (measured > .5 && _CameraOpaqueTexture_TexelSize.z > 2 && _CameraOpaqueTexture_TexelSize.w > 2)
+                {
+                    half3 bed = SampleSceneColor(GetNormalizedScreenSpaceUV(input.positionCS));
+                    half3 filteredBed = min(bed,half3(1.5,1.5,1.5))*half3(.025,.74,.91);
+                    float transmission = .34*exp(-depth*.55);
+                    water = lerp(water,filteredBed,transmission);
+                }
 
                 float strength = lerp(.42,1,SeaBlend(input.positionWS.z)) * _WaveStrength;
                 float3 phase = WavePhase(input.positionWS.xz);
@@ -127,27 +138,32 @@ Shader "CityLife/CoastalWater"
                 float nz = (c.x*.045*.19 + c.y*.034*.37 + c.z*.032*.12)*strength;
                 float ripple = dot(input.positionWS.xz,float2(2.2,1.4)) + _Time.y*.85;
                 float rippleFilter = 1-smoothstep(.6,2.0,fwidth(ripple));
-                nx += sin(ripple)*.018*rippleFilter*_WaveStrength;
-                nz += cos(ripple*.83)*.013*rippleFilter*_WaveStrength;
+                nx += sin(ripple)*.033*rippleFilter*_WaveStrength;
+                nz += cos(ripple*.83)*.024*rippleFilter*_WaveStrength;
                 half3 normalWS = normalize(float3(-nx,1,-nz));
                 half3 view = GetWorldSpaceNormalizeViewDir(input.positionWS);
                 float fresnel = pow(1-saturate(dot(normalWS,view)),4);
                 // Keep turquoise readable in the intended navy lighting. This is a deliberately
                 // luminous art surface, not a physical ocean/sky reflection simulation.
-                water = lerp(water,_SkyReflection.rgb,fresnel*.22);
+                water = lerp(water,_SkyReflection.rgb,fresnel*.15);
                 Light sun = GetMainLight();
                 float glint = pow(saturate(dot(normalWS,normalize(view+sun.direction))),190);
-                water += min(sun.color,half3(2,2,2))*glint*.27;
+                // A small neutral/cool glint keeps the warm key from bleaching the whole colour.
+                float sunStrength = min(1.5,max(sun.color.r,max(sun.color.g,sun.color.b)));
+                water += half3(.55,.85,.95)*sunStrength*glint*.15;
                 float glimmer = sin(phase.x+phase.y*.47)*cos(phase.z-phase.y*.24);
-                water += _ShallowColor.rgb*glimmer*.028*(1-deep);
+                float fineCrest = smoothstep(.72,.98,sin(ripple+sin(phase.y)*.8))*rippleFilter;
+                fineCrest *= .5+.5*cos(phase.x-phase.z);
+                water += _ShallowColor.rgb*(glimmer*.040+fineCrest*.050)*(1-deep*.65);
 
                 // Thin intermittent contact edge only when depth is measured, never a false
                 // white line generated from the fallback colour gradient.
                 float shore = (1-smoothstep(.04,.36,depth))*measured;
                 float pulse = .45+.55*smoothstep(-.5,.65,sin(phase.x*2.1-phase.y*.4));
                 water = lerp(water,_FoamColor.rgb,shore*pulse*.42);
-                float alpha = lerp(.74,.98,saturate(depth/9));
-                alpha *= lerp(1,smoothstep(0,.075,depth),measured);
+                // The opaque scene was already transmitted above. Do not add the warm bed a
+                // second time through ordinary alpha; retain only a narrow actual contact fade.
+                float alpha = lerp(1,smoothstep(0,.045,depth),measured);
                 water = MixFog(water,input.fog);
                 return half4(water,alpha);
             }

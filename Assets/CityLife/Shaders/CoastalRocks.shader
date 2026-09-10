@@ -2,7 +2,7 @@ Shader "CityLife/CoastalRocks"
 {
     Properties
     {
-        _BaseColor("Ochre stone tint",Color)=(.76,.49,.28,1)
+        _BaseColor("Iron-brown stone tint",Color)=(.18,.135,.11,1)
         _BaseMap("Base",2D)="white"{}
         _Vegetation("Succulent vertex colour",Float)=0
         _Cutoff("Cutoff",Float)=.5
@@ -71,7 +71,7 @@ Shader "CityLife/CoastalRocks"
                     albedo*=lerp(.91,1.06,grain);
                     // Dust settles on ledges; the immersed base becomes darker with a cool mineral stain.
                     float dust=saturate(n.y)*smoothstep(.25,.74,broad);
-                    albedo=lerp(albedo,float3(.65,.47,.30),dust*.27);
+                    albedo=lerp(albedo,float3(.29,.235,.18),dust*.22);
                     float wet=1-smoothstep(-2.10,-1.58,p.y);
                     albedo*=lerp(float3(1,1,1),float3(.48,.64,.67),wet*.85);
                     smoothness=lerp(.12,.31,wet);

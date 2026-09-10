@@ -27,13 +27,62 @@ namespace CityLife.World.Editor
                 subjects.Add(new Subject{Root=rocks,Kind="coastal-rocks-and-succulents"});
                 subjects.Add(new Subject{Root=water,Kind="coastal-water-surface"});
                 BuildCoastalGalaxy();
-                File.WriteAllText(Path.Combine(outputDirectory,"coastal-definition.json"),
-                    "{\"worldId\":\"starfall.coastal-slice.v1\",\"terrainSeed\":1904242,\"treeSeed\":4242,\"rockSeed\":4242,\"version\":\"1\",\"reference\":\"User attachments 02/03/06 provisional; exact requested frame pending\",\"boundsMetres\":{\"minX\":-90,\"maxX\":90,\"minZ\":-55,\"maxZ\":145},\"waterLevelMetres\":-2,\"sideCamera\":{\"position\":[21,4.6,-25],\"target\":[0,3.4,14],\"fieldOfView\":52},\"acceptance\":\"First actual Unity composition; not an exact artwork match or playable world\"}");
+                File.WriteAllText(Path.Combine(outputDirectory,"coastal-definition.json"),JsonUtility.ToJson(new CoastalDefinition(),true));
+                VerifyCoastalCollision(terrain,rocks);
             }
             coast.SetActive(true);
             camera.GetComponent<UniversalAdditionalCameraData>().requiresDepthTexture=true;
             camera.GetComponent<UniversalAdditionalCameraData>().requiresColorTexture=true;
             camera.farClipPlane=1500;
+        }
+
+        [Serializable]private sealed class CoastalDefinition
+        {
+            public string worldId=CoastalTerrain.DefinitionId,terrainContentRevision=CoastalTerrain.ContentRevision;
+            public int terrainSeed=CoastalTerrain.Seed,treeSeed=4242,rockSeed=CoastalRocks.Seed;
+            public string terrainSourceSha256=IslandDefinition.Hash(File.ReadAllBytes("Assets/CityLife/Scripts/CoastalTerrain.cs"));
+            public string rockSourceSha256=IslandDefinition.Hash(File.ReadAllBytes("Assets/CityLife/Scripts/CoastalRocks.cs"));
+            public string waterSourceSha256=IslandDefinition.Hash(File.ReadAllBytes("Assets/CityLife/Scripts/CoastalWater.cs"));
+            public string reference="User attachments 02/03/06 provisional; exact requested frame pending";
+            public Vector3 minimum=new Vector3(-90,-18,-55),maximum=new Vector3(90,30,145);
+            public float waterLevelMetres=-2;
+            public Vector3 sideCameraPosition=new Vector3(21,4.6f,-25),sideCameraTarget=new Vector3(0,3.4f,14);
+            public float fieldOfView=52;
+            public string visualOcean="Additional surface x[-960,960],z[145,1015], visual only; outside active terrain/collision slice";
+            public string acceptance="Actual Unity composition and scene collider probes; no exact reference match, swimming or native coastal player acceptance";
+        }
+
+        private static void VerifyCoastalCollision(GameObject terrain,GameObject rocks)
+        {
+            Physics.SyncTransforms();
+            var result=new CoastalCollisionRecord();
+            foreach(MeshCollider collider in rocks.GetComponentsInChildren<MeshCollider>())
+            {
+                result.rockColliders++;
+                if(collider.sharedMesh!=collider.GetComponent<MeshFilter>().sharedMesh||collider.convex||!collider.enabled)throw new InvalidOperationException("Rock collider differs from rendered mesh.");
+                var ray=new Ray(new Vector3(collider.bounds.center.x,collider.bounds.max.y+2,collider.bounds.center.z),Vector3.down);
+                if(!collider.Raycast(ray,out RaycastHit hit,collider.bounds.size.y+4))throw new InvalidOperationException("Actual rock collider raycast failed: "+collider.name);
+                result.rockRayHits++;
+            }
+            if(result.rockColliders!=84)throw new InvalidOperationException("Expected the 84 recorded coastal rock colliders.");
+            MeshCollider ground=terrain.GetComponent<MeshCollider>();
+            if(ground==null)ground=terrain.GetComponentInChildren<MeshCollider>();
+            if(ground==null)throw new InvalidOperationException("Coastal terrain collider missing.");
+            Vector3[] vertices=ground.sharedMesh.vertices;
+            for(int i=1;i<=8;i++)
+            {
+                Vector3 expected=ground.transform.TransformPoint(vertices[i*(vertices.Length/9)]);
+                if(!ground.Raycast(new Ray(expected+Vector3.up*100,Vector3.down),out RaycastHit hit,140)||Mathf.Abs(hit.point.y-expected.y)>.025f)throw new InvalidOperationException("Terrain collider does not match its actual mesh vertex.");
+                result.terrainRayHits++;
+            }
+            result.status="PASS";
+            File.WriteAllText(Path.Combine(outputDirectory,"coastal-collision.json"),JsonUtility.ToJson(result,true));
+        }
+        [Serializable]private sealed class CoastalCollisionRecord
+        {
+            public string status;
+            public int rockColliders,rockRayHits,terrainRayHits;
+            public string scope="Actual Unity scene PhysX rays against exact static rendered rock/terrain meshes. Not a native coastal player movement or swimming test.";
         }
 
         private static void CoastalCamera(Vector3 position,Vector3 aim)
@@ -51,8 +100,10 @@ namespace CityLife.World.Editor
         private static void BuildCoastalGalaxy()
         {
             var mesh=new Mesh{name="Procedural distant galaxy sky plane"};
-            mesh.vertices=new[]{new Vector3(-650,-60,600),new Vector3(650,-60,600),new Vector3(650,420,600),new Vector3(-650,420,600)};
-            mesh.uv=new[]{Vector2.zero,Vector2.right,Vector2.one,Vector2.up};
+            Vector3[] vertices={new Vector3(-2000,-400,600),new Vector3(2000,-400,600),new Vector3(2000,1200,600),new Vector3(-2000,1200,600)};
+            mesh.vertices=vertices;
+            var uv=new Vector2[4];for(int i=0;i<4;i++)uv[i]=new Vector2((vertices[i].x+650)/1300,(vertices[i].y+60)/480);
+            mesh.uv=uv;
             mesh.triangles=new[]{0,2,1,0,3,2};mesh.RecalculateBounds();owned.Add(mesh);
             var sky=new GameObject("Distant galaxy - procedural dust and stellar band");sky.transform.SetParent(backdrop.transform,false);
             sky.AddComponent<MeshFilter>().sharedMesh=mesh;

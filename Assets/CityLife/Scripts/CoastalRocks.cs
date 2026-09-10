@@ -15,8 +15,8 @@ namespace CityLife.World
             root.transform.SetParent(parent, false);
             var shader = Shader.Find("CityLife/CoastalRocks");
             if (shader == null) throw new InvalidOperationException("Missing CityLife/CoastalRocks shader.");
-            var rock = new Material(shader) { name = "Warm ochre fractured shore stone" };
-            rock.SetColor("_BaseColor", new Color(.76f, .49f, .28f, 1));
+            var rock = new Material(shader) { name = "Warm charcoal iron-brown fractured shore stone" };
+            rock.SetColor("_BaseColor", new Color(.18f, .135f, .11f, 1));
             var plants = new Material(shader) { name = "Blue green succulent wax and small flowers" };
             plants.SetColor("_BaseColor", Color.white);
             plants.SetFloat("_Vegetation", 1);
@@ -84,7 +84,10 @@ namespace CityLife.World
         {
             // Bottom is embedded, while the visible top and collider come from the same mesh.
             var go = MeshObject("Stratified shore rock " + id,RockMesh(width,height,depth,id),material,parent,true);
-            go.transform.localPosition = new Vector3(x,CoastalTerrain.Height(x,z) - height*.13f,z);
+            // R01 camera03 exposed an excessive downslope overhang on this one block.
+            // Its sampled lower face stood 1.02 m above the field despite upslope contact.
+            float placementCorrection = id == 209 ? 1.15f : 0;
+            go.transform.localPosition = new Vector3(x,CoastalTerrain.Height(x,z) - height*.13f-placementCorrection,z);
             go.transform.localRotation = Quaternion.Euler(0,Lerp(-180,180,id,90),0);
         }
 
