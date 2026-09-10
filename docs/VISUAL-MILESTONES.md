@@ -454,3 +454,12 @@ This is a separate player release, not another tree critique. [Release notes and
 ![Actual new R19 native window and versioned HUD](../evidence/milestones/starfall-r19-player/2026-09-10-native-r19-window.png)
 
 Observed after the user authorized visible launch. No agent movement input was sent. Automatic shared-controller checks are separately recorded in the [player report](../evidence/milestones/starfall-r19-player/preview-smoke-20260910-223430-378.json). [Two prebuild views](../evidence/milestones/kokerboom/round-20/metrics.json) are integration evidence, not a new scored round.
+
+
+## Coastal slice — baseline and one revision
+
+[First coastal review](COASTAL-SLICE.md) preserves four actual Unity views per round, exact camera/light comparisons, subjective score deltas and remaining gaps. This is separate from the R19 player release.
+
+![Actual Unity coastal R02 side-view](../evidence/milestones/coastal/round-02/2026-09-10-01-coastal-side-composition.png)
+
+Colour and bank contrast improved after one revision. Water realism/outlet seam, geological detail and flora visibility remain open. Visual work stops here for user review; no underwater-life or native coastal-player completion is claimed.

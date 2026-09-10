@@ -16,16 +16,16 @@ A world in the making · Unity 6 · Windows preview
 
 Beneath a blue giant and a river of stars, warm desert gives way to luminous seas. Explore, shape, and one day inhabit a world still becoming.
 
-**That is the destination. Today, Starfall is an approximately 60 m tree and blue-giant study** with a separate local Windows preview. The sculpted landscape, visible galaxy and living sea are planned. World shaping, houses, building tools, inhabitants, bots and shared-world connections are future work.
+**That is the destination. The playable R19 release remains an approximately 60 m tree and blue-giant study.** This branch adds a separate [first coastal scene review](docs/COASTAL-SLICE.md): rocky tree bank, turquoise river/sea, canyon terrain and procedural galaxy in actual Unity views. It is not yet a coastal player or living sea. World shaping, houses, building tools, inhabitants, bots and shared-world connections are future work.
 
 ## 🌌 The world ahead
 
 | Element | Direction | Current state |
 |---|---|---|
 | Trees | Gold and ochre kokerboom trunks, rounded crowns and cool blue-green rosettes | R06 approved reference; R19 experiment frozen |
-| Land | Warm sculpted mesas, rocky shores and turquoise bays | Small ground study only |
-| Sky | A large blue gas giant, moons and a distant galaxy | Prototype giant and stars; wider sky work planned |
-| Sea | Clear shallows, submerged arches, kelp-like growth, coral forms, fish schools and rays | [Living sea design](docs/STARFALL-LIVING-SEA.md); unimplemented |
+| Land | Warm sculpted mesas, rocky shores and turquoise bays | Bounded coastal scene review; no coastal player yet |
+| Sky | A large blue gas giant, moons and a distant galaxy | Giant/stars in R19; procedural galaxy in coastal study |
+| Sea | Clear shallows, submerged arches, kelp-like growth, coral forms, fish schools and rays | Surface colour study; underwater life and swimming unimplemented |
 | Life and building | Explore, shape and eventually inhabit the world | Future scope |
 
 The [visual direction](docs/KOKERBOOM-REFERENCE.md) records the concept references separately from actual Unity evidence. The new landscape will have its own versioned world definition, preserving the earlier island and its saved edits.
@@ -76,7 +76,7 @@ The preview has no implemented multiplayer, bot connections or saved-world loadi
 | Visual reference and tree closeout | **R06 user approved**; frozen after the completed R19 review | [Baseline record](docs/TREE-BASELINE.md) | Experimental R19 is separate; remaining defects deferred, no further 9/10 polishing gate |
 | Revised experimental PH02 source | **R18 numeric PASS, 536 assertions** | [Exact report](evidence/verified/kokerboom-round-18-family-validation.json) | All 21 R19 captures complete; independent result 7.375/10, frozen; R16 failure preserved; separate R19 player now recorded below |
 | Starfall branding | Versioned R19 title and HUD observed | [Native window](evidence/milestones/starfall-r19-player/2026-09-10-native-r19-window.png) | None for naming |
-| Wider world and living sea | Planned | [World direction](docs/STARFALL.md), [sea plan](docs/STARFALL-LIVING-SEA.md) | Implementation and actual scene evidence |
+| Coastal world study | First two actual Unity comparison sets complete | [Review and gaps](docs/COASTAL-SLICE.md) | User review, native coastal player and living sea |
 
 ## 🧭 Project guide
 

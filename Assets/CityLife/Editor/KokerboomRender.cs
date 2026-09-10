@@ -20,7 +20,7 @@ namespace CityLife.World.Editor
     /// RenderBatch is launched by tools/render-kokerboom.ps1 without -nographics or -quit.
     /// Technical checks deliberately do not score the artwork or claim model acceptance.
     /// </summary>
-    public static class KokerboomRender
+    public static partial class KokerboomRender
     {
         private sealed class Subject
         {
@@ -106,7 +106,7 @@ namespace CityLife.World.Editor
         private static AmbientRecord initialAmbient;
         private static Material[] diagnosticOriginalMaterials;
         private static Renderer diagnosticRenderer;
-        private static int ExpectedCaptures => playablePreviewMode ? 2 : ph02FamilyMode ? ph02SelectedShotIds.Length : woodDiagnosticMode ? 3 : ph02FittedMode ? 12 : ph01TangentMode ? (ph01OriginalSubsetsReady ? 12 : 8) : ph02CrownMode ? 8 : importedCandidateMode ? 12 : hybridMode ? 21 : 15;
+        private static int ExpectedCaptures => coastalMode ? 4 : playablePreviewMode ? 2 : ph02FamilyMode ? ph02SelectedShotIds.Length : woodDiagnosticMode ? 3 : ph02FittedMode ? 12 : ph01TangentMode ? (ph01OriginalSubsetsReady ? 12 : 8) : ph02CrownMode ? 8 : importedCandidateMode ? 12 : hybridMode ? 21 : 15;
 
         public static void RenderBatch() => Run(false);
         public static void RenderImportedCandidates() => Run(true);
@@ -132,7 +132,8 @@ namespace CityLife.World.Editor
                 SetupPipeline();
                 SetupScene();
                 List<Shot> shots = woodDiagnosticMode ? BuildShots().Where(s=>s.Id.StartsWith("04-",StringComparison.Ordinal)||s.Id.StartsWith("05-",StringComparison.Ordinal)||s.Id.StartsWith("15-",StringComparison.Ordinal)).ToList() : ph02FittedMode ? BuildPH02FittedShots() : ph01TangentMode ? BuildPH01TangentShots() : ph02CrownMode ? BuildPH02Shots() : playablePreviewMode ? BuildPreviewShots() : importedCandidateMode ? BuildImportedShots() : BuildShots();
-                if(ph02FamilyMode&&!playablePreviewMode)shots=shots.Where(s=>ph02SelectedShotIds.Contains(s.Id,StringComparer.Ordinal)).ToList();
+                if(coastalMode)shots=BuildCoastalShots();
+                else if(ph02FamilyMode&&!playablePreviewMode)shots=shots.Where(s=>ph02SelectedShotIds.Contains(s.Id,StringComparer.Ordinal)).ToList();
                 foreach (Shot shot in shots)
                 {
                     shot.Configure();
@@ -196,7 +197,7 @@ namespace CityLife.World.Editor
                 if(playablePreviewMode&&(seed!=4242||ph02FoliageTint!=1))throw new ArgumentException("Frozen R19 preview requires seed4242 and foliage tint1.");
             }
             if (width < 800 || width > 3840) throw new ArgumentException("Width must be between 800 and 3840 pixels.");
-            relativeDirectory = "evidence/milestones/kokerboom/" + round;
+            relativeDirectory = (coastalMode?"evidence/milestones/coastal/":"evidence/milestones/kokerboom/") + round;
             outputDirectory = Path.Combine(Path.GetDirectoryName(Application.dataPath), relativeDirectory);
             if (Directory.Exists(outputDirectory) && Directory.EnumerateFiles(outputDirectory).Any())
                 throw new IOException("This render round already contains evidence. Select a new round; previous captures are preserved.");
@@ -1706,6 +1707,13 @@ ENDHLSL
                 report.status=passed?"Frozen R19 prebuild captures completed":"Technical rendering failure; see local editor log";
                 report.scope="Two existing study views before a separately versioned player bake. Frozen R19 PH02 family, seed4242, foliage tint1. No new tree polishing, wider landscape or full-family review.";
                 report.visualAcceptance="R19 review remains frozen at7.375/10; these captures establish build integration only. Native player evidence is separate.";
+            }
+            if(coastalMode)
+            {
+                report.mode="starfall-coastal-slice-first-composition";
+                report.status=passed?"Actual Unity coastal comparison views completed":"Technical coastal rendering failure";
+                report.scope="Separate coastal slice v1, terrain seed1904242, tree/rock seed4242, 180x200m. Provisional user concept reference; fixed side-view and element cameras. Frozen R19 tree, rocky bank, turquoise river opening toward sea, canyon terrain and procedural sky. No swimming, aquatic animals, saved world or native player acceptance.";
+                report.visualAcceptance="First combined scene for proportional element and composition review; exact reference match and user acceptance are not established.";
             }
             File.WriteAllText(Path.Combine(outputDirectory, "metrics.json"), JsonUtility.ToJson(report, true));
         }
