@@ -9,7 +9,7 @@ SHA256: `e6e63fc0e225cc0d3db10ce5a5247dfe68b20e1f9cab659706342a6b05943c4c`.
 
 | Claim | Status | Evidence | Remaining gap |
 |---|---|---|---|
-| Visible button enters fullscreen and returns to a window | Verified in native player | [Transition records](../evidence/milestones/display-toggle/native/display-mode-20260912-184118-151.jsonl); actual frames observed | Other displays/devices untested |
+| Visible button enters fullscreen and returns to a window | Verified in native player | [Transition records](../evidence/milestones/display-toggle/native/verified-button-transitions.jsonl); actual frames observed | Other displays/devices untested |
 | Original usable window size is restored | Verified: 1280×720 → 2880×1800 → 1280×720 | Same transition records | Restoration following manual resizing unverified |
 | Gameplay remains intact across the two transitions | Verified at stationary player | Scene handle, player position/rotation, walk mode and travel distance unchanged; frame count advances | Simultaneous movement during switching untested |
 | Build and existing player movement/rendering checks | Passed | [Build record](../evidence/milestones/kokerboom/round-21/preview-build.json); 2,841 IslandValidation assertions; [player evidence](../evidence/milestones/display-toggle/player-smoke/) contains 146 checks and three actual URP captures, zero runtime errors | Automatic checks do not establish native input or sustained FPS |
