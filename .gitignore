@@ -29,3 +29,6 @@ Assets/CityLife/GeneratedPreview-*/
 Assets/CityLife/GeneratedPreview-*.meta
 __pycache__/
 *.py[cod]
+
+# Keep ongoing local player evidence separate from reviewed acceptance snapshots.
+evidence/milestones/display-toggle/native/display-mode-*.jsonl

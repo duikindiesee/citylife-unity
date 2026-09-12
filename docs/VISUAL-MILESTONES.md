@@ -454,3 +454,9 @@ This is a separate player release, not another tree critique. [Release notes and
 ![Actual new R19 native window and versioned HUD](../evidence/milestones/starfall-r19-player/2026-09-10-native-r19-window.png)
 
 Observed after the user authorized visible launch. No agent movement input was sent. Automatic shared-controller checks are separately recorded in the [player report](../evidence/milestones/starfall-r19-player/preview-smoke-20260910-223430-378.json). [Two prebuild views](../evidence/milestones/kokerboom/round-20/metrics.json) are integration evidence, not a new scored round.
+
+## Display controls — 0.0.2-preview.2
+
+The visible fullscreen/windowed button passed both native transitions, restoring 1280×720 and preserving scene/player state. [Release evidence](RELEASE-0.0.2-preview.2.md) distinguishes these observations from automatic checks, unverified resize/shortcut acceptance, and the user's Escape stop. Earlier tree renders and players remain unchanged.
+
+![Actual restored preview.2 window](../evidence/milestones/display-toggle/native/03-restored-window.png)
