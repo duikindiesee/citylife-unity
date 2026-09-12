@@ -78,7 +78,7 @@ namespace CityLife.World
                 beforePosition = transform.position, beforeRotation = transform.eulerAngles,
                 beforeTravelled = explorer == null ? 0 : explorer.TravelledMetres,
                 beforeControllerMode = explorer == null ? "" : explorer.CurrentMode,
-                beforeSceneHandle = gameObject.scene.handle, beforeFrame = Time.frameCount
+                beforeSceneHandle = gameObject.scene.handle.GetRawData(), beforeFrame = Time.frameCount
             };
             changing = true;
             Screen.SetResolution(width, height, mode);
@@ -96,7 +96,7 @@ namespace CityLife.World
             record.afterPosition = transform.position; record.afterRotation = transform.eulerAngles;
             record.afterTravelled = explorer == null ? 0 : explorer.TravelledMetres;
             record.afterControllerMode = explorer == null ? "" : explorer.CurrentMode;
-            record.afterSceneHandle = gameObject.scene.handle; record.afterFrame = Time.frameCount;
+            record.afterSceneHandle = gameObject.scene.handle.GetRawData(); record.afterFrame = Time.frameCount;
             record.displayApplied = stableFrames >= 3;
             record.scenePreserved = record.beforeSceneHandle == record.afterSceneHandle;
             record.playerStateUnchanged = record.beforePosition == record.afterPosition &&
@@ -140,7 +140,8 @@ namespace CityLife.World
         {
             public string utc, version, source, beforeMode, requestedMode, afterMode, beforeControllerMode, afterControllerMode;
             public int beforeWidth, beforeHeight, requestedWidth, requestedHeight, rememberedWidth, rememberedHeight,
-                afterWidth, afterHeight, beforeSceneHandle, afterSceneHandle, beforeFrame, afterFrame;
+                afterWidth, afterHeight, beforeFrame, afterFrame;
+            public ulong beforeSceneHandle, afterSceneHandle;
             public Vector3 beforePosition, afterPosition, beforeRotation, afterRotation;
             public double beforeTravelled, afterTravelled;
             public bool displayApplied, scenePreserved, playerStateUnchanged;
